@@ -1,5 +1,7 @@
 package templates
 
 templ IndexPage() {
-    <p>Hello, World</p>
+    @BaseLayout("Home") {
+        <h1>Hello, World!</h1>
+    }
 }
