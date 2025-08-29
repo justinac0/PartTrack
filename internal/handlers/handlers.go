@@ -33,8 +33,9 @@ func Setup(e *echo.Echo) {
 	auth.Setup(e)
 
 	e.GET("/", indexPage)
-	e.GET("/user", auth.Middleware(userStore.GetUsers))
-	e.GET("/dashboard", func(c echo.Context) error {
+	e.GET("/users", auth.Middleware(userStore.GetAll))
+	e.GET("/user/:id", auth.Middleware(userStore.GetOne))
+	e.GET("/dashboard", auth.Middleware(func(c echo.Context) error {
 		return c.String(http.StatusOK, "dashboard")
-	})
+	}))
 }

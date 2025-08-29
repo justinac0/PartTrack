@@ -33,5 +33,5 @@ func main() {
 	handlers.Setup(e)
 
 	// ready to listen
-	e.Logger.Fatal(e.Start("127.0.0.1:1323"))
+	e.Logger.Fatal(e.Start("127.0.0.1:8000"))
 }
