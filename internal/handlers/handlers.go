@@ -17,11 +17,9 @@ func render(c echo.Context, status int, t templ.Component) error {
 }
 
 func indexPage(c echo.Context) error {
-	session := http.Cookie{
-		Name:  "session",
-		Value: "this is a test",
-	}
-	c.SetCookie(&session)
+
+	cookies := c.Cookies()
+	fmt.Println(cookies)
 
 	return render(c, http.StatusOK, templates.IndexPage())
 }
@@ -31,9 +29,6 @@ func Setup(e *echo.Echo) {
 
 	e.GET("/", indexPage)
 	e.GET("/dashboard", func(c echo.Context) error {
-		cookies := c.Cookies()
-		fmt.Println(cookies)
-
 		return c.String(http.StatusOK, "dashboard")
 	})
 }
