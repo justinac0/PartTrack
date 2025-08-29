@@ -27,7 +27,7 @@ func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 func Setup(e *echo.Echo) {
 	e.POST("/signin", func(c echo.Context) error {
-		// user := c.FormValue("username")
+		user := c.FormValue("username")
 		pass := c.FormValue("password")
 
 		passHash, err := hashPassword(pass)
@@ -35,9 +35,7 @@ func Setup(e *echo.Echo) {
 			panic(err)
 		}
 
-		fmt.Println(passHash)
-
-		// fmt.Printf("username: %s, pass_hash: %s, %v\n", user, string(passHash), verifyPassword(pass, passHash))
+		fmt.Println(user, passHash)
 
 		c.Response().Header().Add("HX-Redirect", "/dashboard")
 		return c.NoContent(http.StatusOK)
