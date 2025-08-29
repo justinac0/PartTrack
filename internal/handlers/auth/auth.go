@@ -13,9 +13,16 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func verifyPassword(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
+// func verifyPassword(password, hash string) bool {
+// 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+// 	return err == nil
+// }
+
+// TODO: add role based auth paired with session auth
+func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return next(c)
+	}
 }
 
 func Setup(e *echo.Echo) {
