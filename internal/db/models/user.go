@@ -1,16 +1,30 @@
 package models
 
-type UserRole int
+import (
+	"PartTrack/internal/db"
+	"fmt"
+	"log"
+	"net/http"
 
-const (
-	GUEST UserRole = iota
-	CUSTOMER
-	EMPLOYEE
-	ADMIN
+	"github.com/labstack/echo/v4"
 )
 
-type User struct {
-	Name     string   `json:"name"`
-	Password string   `json:"password"`
-	Role     UserRole `json:"role"`
+type UserHandler struct {
+	Store *db.Store
+}
+
+func (h *UserHandler) GetUser(c echo.Context) error {
+	log.Println("not implemented")
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *UserHandler) GetUsers(c echo.Context) error {
+	rows, err := h.Store.DB.Query("SELECT * FROM user;")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(rows)
+
+	return c.NoContent(http.StatusOK)
 }

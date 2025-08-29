@@ -1,7 +1,6 @@
 package main
 
 import (
-	"PartTrack/internal/db"
 	"PartTrack/internal/handlers"
 
 	"github.com/labstack/echo/v4"
@@ -30,13 +29,7 @@ func main() {
 	e := InitEcho()
 	e.Logger.SetLevel(log.DEBUG)
 
-	// setup db
-	err := db.InitDB()
-	if err != nil {
-		panic(err)
-	}
-	defer db.CloseDB()
-
+	// setup handlers
 	handlers.Setup(e)
 
 	// ready to listen

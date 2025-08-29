@@ -2,15 +2,13 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
-
-var db *sql.DB
 
 type config struct {
 	User string `env:"DBUSER"`
@@ -19,34 +17,43 @@ type config struct {
 	Name string `env:"DBNAME"`
 }
 
-func InitDB() error {
+var store *Store
+
+func getConnString() (string, error) {
 	err := godotenv.Load()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var cfg config
 	err = env.Parse(&cfg)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=verify-full", cfg.User, cfg.Pass, cfg.Host, cfg.Name)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", cfg.User, cfg.Pass, cfg.Host, cfg.Name)
 
-	db, err = sql.Open("postgres", connStr)
+	return connStr, nil
+}
+
+func Init() {
+	if store != nil {
+		log.Fatalln("db store has already been initialized")
+		return
+	}
+
+	connStr, err := getConnString()
 	if err != nil {
-		return err
+		panic(err)
 	}
 
-	return nil
-}
-
-func GetHandle() *sql.DB {
-	return db
-}
-
-func CloseDB() {
-	if db != nil {
-		db.Close()
+	store, err = NewStore(connStr)
+	if err != nil {
+		panic(err)
 	}
+
+}
+
+func GetStore() *Store {
+	return store
 }

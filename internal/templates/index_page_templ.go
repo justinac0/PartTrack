@@ -41,7 +41,7 @@ func IndexPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>PartTrack 💻</h1><form id=\"signin\" hx-post=\"/signin\" hx-swap=\"none\"><label>Username</label><br><input type=\"text\" name=\"username\" required><br><br><label>Password</label><br><input type=\"password\" name=\"password\" required><br><br><button type=\"submit\" value=\"submit\">Signin</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form id=\"signin\" hx-post=\"/signin\" hx-swap=\"none\" style=\"padding: 1em; border: 1px solid black; border-radius: 5px; background-color: var(--grey-50); max-width: 256px; text-align: center;\"><h1>PartTrack 💻</h1><hr><br><label>Username</label><br><input type=\"text\" name=\"username\" width=\"100%\" required><br><br><label>Password</label><br><input type=\"password\" name=\"password\" width=\"100%\" required><br><br><button type=\"submit\" value=\"submit\">Signin</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

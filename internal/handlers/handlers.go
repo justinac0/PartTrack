@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"PartTrack/internal/db"
+	"PartTrack/internal/db/models"
 	"PartTrack/internal/handlers/auth"
 	"PartTrack/internal/templates"
 	"fmt"
@@ -17,7 +19,6 @@ func render(c echo.Context, status int, t templ.Component) error {
 }
 
 func indexPage(c echo.Context) error {
-
 	cookies := c.Cookies()
 	fmt.Println(cookies)
 
@@ -25,9 +26,14 @@ func indexPage(c echo.Context) error {
 }
 
 func Setup(e *echo.Echo) {
+	db.Init()
+
+	userStore := models.UserHandler{Store: db.GetStore()}
+
 	auth.Setup(e)
 
 	e.GET("/", indexPage)
+	e.GET("/user", userStore.GetUsers)
 	e.GET("/dashboard", func(c echo.Context) error {
 		return c.String(http.StatusOK, "dashboard")
 	})
