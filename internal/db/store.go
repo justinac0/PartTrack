@@ -1,22 +1,9 @@
 package db
 
-import (
-	"database/sql"
-)
-
-type Store struct {
-	DB *sql.DB
-}
-
-func NewStore(connStr string) (*Store, error) {
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = db.Ping(); err != nil {
-		return nil, err
-	}
-
-	return &Store{DB: db}, nil
+type Store[T any] interface {
+	GetAll() ([]T, error)
+	GetOne(id int64) (*T, error)
+	Add(data T) (*T, error)
+	Delete(id int64, data T) (*T, error)
+	Update(id int64, data T) (*T, error)
 }

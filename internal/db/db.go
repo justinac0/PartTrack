@@ -2,8 +2,9 @@
 package db
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
-	"log"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
@@ -17,7 +18,7 @@ type config struct {
 	Name string `env:"DBNAME"`
 }
 
-var store *Store
+var handle *sql.DB
 
 func getConnString() (string, error) {
 	err := godotenv.Load()
@@ -36,10 +37,9 @@ func getConnString() (string, error) {
 	return connStr, nil
 }
 
-func Init() {
-	if store != nil {
-		log.Fatalln("db store has already been initialized")
-		return
+func Init() error {
+	if handle != nil {
+		return errors.New("db connection already exists")
 	}
 
 	connStr, err := getConnString()
@@ -47,12 +47,18 @@ func Init() {
 		panic(err)
 	}
 
-	store, err = NewStore(connStr)
+	handle, err = sql.Open("postgres", connStr)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	if err = handle.Ping(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func GetStore() *Store {
-	return store
+func GetHandle() *sql.DB {
+	return handle
 }

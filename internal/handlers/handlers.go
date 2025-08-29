@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"PartTrack/internal/db"
-	"PartTrack/internal/db/models"
 	"PartTrack/internal/handlers/auth"
+	"PartTrack/internal/handlers/services/user"
 	"PartTrack/internal/templates"
 	"fmt"
 	"net/http"
@@ -28,13 +28,13 @@ func indexPage(c echo.Context) error {
 func Setup(e *echo.Echo) {
 	db.Init()
 
-	userStore := models.UserHandler{Store: db.GetStore()}
-
 	auth.Setup(e)
 
+	userHandler := user.NewUserHandler()
+
 	e.GET("/", indexPage)
-	e.GET("/users", auth.Middleware(userStore.GetAll))
-	e.GET("/user/:id", auth.Middleware(userStore.GetOne))
+	e.GET("/users", auth.Middleware(userHandler.GetUsers))
+	e.GET("/user/:id", auth.Middleware(userHandler.GetUser))
 	e.GET("/dashboard", auth.Middleware(func(c echo.Context) error {
 		return c.String(http.StatusOK, "dashboard")
 	}))
