@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: default
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: PartTrackDB
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080 
+

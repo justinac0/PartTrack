@@ -1,0 +1,49 @@
+/* Material Design Colors
+ * https://materialui.co/colors
+ */
+:root {
+    /* RED */
+    --red-50: #FFEBEE;
+    --red-100: #FFCDD2;
+    --red-200: #EF9A9A;
+    --red-300: #E57373;
+    --red-400: #EF5350;
+    --red-500: #F44336;
+    --red-600: #F44336;
+    --red-700: #D32F2F;
+    --red-800: #C62828;
+    --red-900: #B71C1C;
+    --red-A100: #FF8A80;
+    --red-A200: #FF5252;
+    --red-A400: #FF1744;
+    --red-A700: #D50000;
+    
+    /* GREY */
+    --grey-50: #FAFAFA;
+    --grey-100: #F5F5F5;
+    --grey-200: #EEEEEE;
+    --grey-300: #E0E0E0;
+    --grey-400: #BDBDBD;
+    --grey-500: #9E9E9E;
+    --grey-600: #757575;
+    --grey-700: #616161;
+    --grey-800: #424242;
+    --grey-900: #212121;
+
+    /* BLUE GREY */
+    --blue-grey-50: #ECEFF1;
+    --blue-grey-100: #CFD8DC;
+    --blue-grey-200: #B0BEC5;
+    --blue-grey-300: #90A4AE;
+    --blue-grey-400: #78909C;
+    --blue-grey-500: #607D8B;
+    --blue-grey-600: #546E7A;
+    --blue-grey-700: #455A64;
+    --blue-grey-800: #37474F;
+    --blue-grey-900: #263238;
+}
+
+body {
+    background-color: var(--grey-900);
+    color: var(--grey-50);
+}

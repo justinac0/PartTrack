@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	"PartTrack/cmd/internal/templates"
+	"PartTrack/internal/templates"
 	"net/http"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
-// move to helper
+// TODO: move to helper
 func render(c echo.Context, status int, t templ.Component) error {
 	c.Response().Writer.WriteHeader(status)
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
@@ -22,3 +22,4 @@ func indexPage(c echo.Context) error {
 func Setup(e *echo.Echo) {
 	e.GET("/", indexPage)
 }
+
