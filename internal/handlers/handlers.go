@@ -3,9 +3,9 @@ package handlers
 import (
 	"PartTrack/internal/db"
 	"PartTrack/internal/handlers/auth"
-	"PartTrack/internal/handlers/services/user"
+	"PartTrack/internal/resource/sessions"
+	"PartTrack/internal/resource/users"
 	"PartTrack/internal/templates"
-	"fmt"
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -19,8 +19,11 @@ func render(c echo.Context, status int, t templ.Component) error {
 }
 
 func indexPage(c echo.Context) error {
-	cookies := c.Cookies()
-	fmt.Println(cookies)
+	err := auth.CheckSession(c)
+	if err == nil {
+		c.Request().Header.Add("HX-Redirect", "/dashboard")
+		return c.NoContent(http.StatusOK)
+	}
 
 	return render(c, http.StatusOK, templates.IndexPage())
 }
@@ -28,13 +31,12 @@ func indexPage(c echo.Context) error {
 func Setup(e *echo.Echo) {
 	db.Init()
 
-	auth.Setup(e)
+	userHandler := users.NewHandler()
+	sessionHandler := sessions.NewHandler()
 
-	userHandler := user.NewUserHandler()
+	auth.Setup(e, userHandler, sessionHandler)
 
 	e.GET("/", indexPage)
-	e.GET("/users", auth.Middleware(userHandler.GetUsers))
-	e.GET("/user/:id", auth.Middleware(userHandler.GetUser))
 	e.GET("/dashboard", auth.Middleware(func(c echo.Context) error {
 		return c.String(http.StatusOK, "dashboard")
 	}))

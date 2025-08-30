@@ -2,7 +2,8 @@ CREATE TYPE USER_ROLE AS ENUM ('guest', 'customer', 'employee', 'admin');
 
 CREATE TABLE users (
     id INT PRIMARY KEY,
-    username VARCHAR(64) UNIQUE NOT NULL,
+    email VARCHAR(128) UNIQUE NOT NULL,
+    username VARCHAR(32) NOT NULL,
     password_hash VARCHAR(128) NOT NULL,
     role USER_ROLE NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

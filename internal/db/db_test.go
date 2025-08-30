@@ -6,11 +6,10 @@ import (
 )
 
 func TestDBConnection(t *testing.T) {
-	err := db.InitDB()
+	err := db.Init()
 	if err != nil {
 		t.Logf("failed to open connection to db: %v", err)
 		t.Fail()
 	}
 
-	db.CloseDB()
 }

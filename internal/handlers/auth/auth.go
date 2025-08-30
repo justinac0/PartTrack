@@ -1,45 +1,50 @@
 package auth
 
 import (
-	"fmt"
+	"PartTrack/internal/resource/sessions"
+	"PartTrack/internal/resource/users"
+	"context"
+	"errors"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 )
 
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-// func verifyPassword(password, hash string) bool {
-// 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-// 	return err == nil
-// }
-
-// TODO: add role based auth paired with session auth
 func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		err := CheckSession(c)
+		if err != nil {
+			return c.NoContent(http.StatusInternalServerError)
+		}
+
 		return next(c)
 	}
 }
 
-func Setup(e *echo.Echo) {
-	e.POST("/signin", func(c echo.Context) error {
-		user := c.FormValue("username")
-		pass := c.FormValue("password")
+func CheckSession(c echo.Context) error {
+	cookie, err := c.Cookie("session")
+	if err == nil {
+		return errors.New("session does not exist")
+	}
 
-		passHash, err := hashPassword(pass)
-		if err != nil {
-			panic(err)
-		}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
 
-		fmt.Println(user, passHash)
+	sessionStore := sessions.NewStore()
+	session, err := sessionStore.GetBySessionID(ctx, cookie.Value)
+	if err != nil {
+		return err
+	}
 
-		c.Response().Header().Add("HX-Redirect", "/dashboard")
-		return c.NoContent(http.StatusOK)
-	})
+	log.Println(session)
+
+	return nil
+}
+
+func Setup(e *echo.Echo, userHandler *users.Handler, sessionHandler *sessions.Handler) {
+	e.POST("/signin", userHandler.SignIn)
 	e.GET("/signout", func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	})
