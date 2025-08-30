@@ -37,14 +37,19 @@ func verifyPassword(password, hash string) bool {
 // delete old session in db if exists, creates new one and sets browsers cookie
 func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 	sessionStore := sessions.NewStore()
+	// session, err := sessionStore.GetByUserId(ctx, userId)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
 	err := sessionStore.Delete(ctx, userId)
 	if err != nil {
-		fmt.Println("[err]: ", err)
+		panic(err)
 	}
 
 	// TODO: write helper for session creation
 	// create session
-	expiry := time.Now().Add(time.Hour * 24).UTC()
+	expiry := time.Now().Add(time.Second * 10).UTC()
 	now := time.Now().UTC()
 
 	sessionId := uuid.New()
@@ -52,8 +57,8 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 	session, err := sessionStore.Create(ctx, sessions.Session{
 		UserId:    userId,
 		SessionId: sessionId.String(), // TODO: generate unique
-		Expiry:    &expiry,
-		Created:   &now,
+		ExpiresAt: &expiry,
+		CreatedAt: &now,
 	})
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
@@ -62,7 +67,7 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 	cookie := http.Cookie{
 		Name:    "session",
 		Value:   session.SessionId,
-		Expires: *session.Expiry,
+		Expires: *session.ExpiresAt,
 		// TODO: needs to support the following cookie attributes in prod
 		// HttpOnly: true,
 		// Secure: true,
@@ -70,7 +75,6 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 
 	c.SetCookie(&cookie)
 
-	fmt.Println("created cookie")
 	return nil
 }
 
@@ -93,11 +97,6 @@ func (h *Handler) SignIn(c echo.Context) error {
 	err = recreateSession(c, ctx, user.Id)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	if user.Role == RoleAdmin {
-		c.Response().Header().Set("HX-Redirect", "/admin")
-		return c.NoContent(http.StatusOK)
 	}
 
 	c.Response().Header().Set("HX-Redirect", "/dashboard")
@@ -134,7 +133,7 @@ func (h *Handler) Register(c echo.Context) error {
 	}
 
 	now := time.Now().UTC()
-	user := User{
+	data := User{
 		Username:     username,
 		Email:        email,
 		PasswordHash: passHash,
@@ -142,12 +141,22 @@ func (h *Handler) Register(c echo.Context) error {
 		CreatedAt:    &now,
 	}
 
-	_, err = h.store.Create(ctx, user)
+	_, err = h.store.Create(ctx, data)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.String(http.StatusCreated, "account created, you can signin now!")
+	user, err := h.store.GetByUsername(ctx, username)
+	if err != nil {
+		panic(err)
+	}
+	err = recreateSession(c, ctx, user.Id)
+	if err != nil {
+		panic(err)
+	}
+
+	c.Response().Header().Set("HX-Redirect", "/dashboard")
+	return c.NoContent(http.StatusOK)
 }
 
 func (h *Handler) GetUserById(c echo.Context) error {
@@ -162,18 +171,6 @@ func (h *Handler) GetUserById(c echo.Context) error {
 	_, err = h.store.GetOne(ctx, id)
 	if err != nil {
 		panic(err)
-	}
-
-	return c.NoContent(http.StatusOK)
-}
-
-func (h *Handler) GetUsers(c echo.Context) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
-	_, err := h.store.GetAll(ctx)
-	if err != nil {
-		return err
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -231,7 +228,6 @@ func ValidateSession(c echo.Context) error {
 		return err
 	}
 
-	fmt.Println(user.Id, session.UserId)
 	if user.Id != session.UserId {
 		return sessions.SessionNotFound
 	}
@@ -240,7 +236,7 @@ func ValidateSession(c echo.Context) error {
 		return sessions.SessionIdInvalid
 	}
 
-	if time.Now().After(*session.Expiry) {
+	if time.Now().After(*session.ExpiresAt) {
 		return sessions.SessionExpired
 	}
 

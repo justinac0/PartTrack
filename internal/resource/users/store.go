@@ -4,7 +4,6 @@ import (
 	"PartTrack/internal/db"
 	"context"
 	"database/sql"
-	"fmt"
 )
 
 type UserStore struct {
@@ -55,12 +54,10 @@ func (s *UserStore) Create(ctx context.Context, data User) (*User, error) {
 		return nil, err
 	}
 
-	result, err := statement.ExecContext(ctx, &data.Email, &data.Username, &data.PasswordHash, &data.Role, &data.CreatedAt)
+	_, err = statement.ExecContext(ctx, &data.Email, &data.Username, &data.PasswordHash, &data.Role, &data.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(result)
 
 	return &data, err
 }

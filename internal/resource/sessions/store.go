@@ -5,7 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 )
 
 type SessionStore struct {
@@ -25,12 +24,28 @@ func (s *SessionStore) GetBySessionId(ctx context.Context, sessionId string) (*S
 		`SELECT session_id, user_id, expires_at, created_at
 		FROM sessions WHERE session_id = $1;`,
 		sessionId)
-	err := row.Scan(&session.SessionId, &session.UserId, &session.Expiry, &session.Created)
+	err := row.Scan(&session.SessionId, &session.UserId, &session.ExpiresAt, &session.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
 
 	return &session, nil
+}
+
+func (s *SessionStore) GetByUserId(ctx context.Context, userId uint64) (*Session, error) {
+	session := Session{}
+	row := s.db.QueryRowContext(
+		ctx,
+		`SELECT session_id, user_id, expires_at, created_at
+		FROM sessions WHERE user_id = $1;`,
+		userId)
+	err := row.Scan(&session.SessionId, &session.UserId, &session.ExpiresAt, &session.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &session, nil
+
 }
 
 func (s *SessionStore) Create(ctx context.Context, data Session) (*Session, error) {
@@ -43,7 +58,7 @@ func (s *SessionStore) Create(ctx context.Context, data Session) (*Session, erro
 	}
 	defer statement.Close()
 
-	result, err := statement.ExecContext(ctx, &data.SessionId, &data.UserId, &data.Expiry, &data.Created)
+	result, err := statement.ExecContext(ctx, &data.SessionId, &data.UserId, &data.ExpiresAt, &data.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -69,12 +84,10 @@ func (s *SessionStore) Delete(ctx context.Context, user_id uint64) error {
 	}
 	defer statement.Close()
 
-	result, err := statement.ExecContext(ctx, user_id)
+	_, err = statement.ExecContext(ctx, user_id)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(result)
 
 	return nil
 }

@@ -2,9 +2,9 @@ CREATE TYPE USER_ROLE AS ENUM ('guest', 'customer', 'employee', 'admin');
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    email VARCHAR(128) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     username VARCHAR(32) NOT NULL,
-    password_hash VARCHAR(128) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     role USER_ROLE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP
@@ -20,5 +20,10 @@ CREATE TABLE sessions (
 );
 
 CREATE TABLE components (
-    id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(64),
+    description VARCHAR(255),
+    footprint VARCHAR(64),
+    manufacturer VARCHAR(64),
+    amount INT NOT NULL
 );
