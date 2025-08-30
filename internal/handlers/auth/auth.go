@@ -3,16 +3,17 @@ package auth
 import (
 	"PartTrack/internal/resource/sessions"
 	"PartTrack/internal/resource/users"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
-func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
+func Middleware(next echo.HandlerFunc, roles []users.UserRole) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := users.ValidateSession(c)
 		if err != nil {
-			return c.HTML(http.StatusUnauthorized, "<h1>Unauthorized Access</h1><a href='/'>goto signin page</a>")
+			return c.HTML(http.StatusUnauthorized, fmt.Sprintf("<h1>Unauthorized Access: %v</h1><a href='/'>goto signin page</a>", err))
 		}
 
 		return next(c)

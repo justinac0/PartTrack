@@ -79,11 +79,11 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 }
 
 func (h *Handler) SignIn(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
+
+	username := c.FormValue("username")
+	password := c.FormValue("password")
 
 	user, err := h.store.GetByUsername(ctx, username)
 	if err != nil {

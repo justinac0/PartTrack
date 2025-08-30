@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"golang.org/x/time/rate"
 )
 
 func InitEcho() *echo.Echo {
@@ -16,7 +17,8 @@ func InitEcho() *echo.Echo {
 		Format: "${method} ${uri} ${status}\n",
 	}))
 	e.Use(middleware.RemoveTrailingSlash())
-	// e.Use(middleware.Recover())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(5))))
+	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
 	e.Static("static/", "static/")
