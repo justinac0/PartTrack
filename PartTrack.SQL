@@ -6,15 +6,15 @@ CREATE TABLE users (
     username VARCHAR(32) NOT NULL,
     password_hash VARCHAR(128) NOT NULL,
     role USER_ROLE NOT NULL,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE sessions (
     session_id VARCHAR(64) NOT NULL,
-    user_id INT NOT NULL,
-    expiry TIMESTAMP,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INT UNIQUE NOT NULL,
+    expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );

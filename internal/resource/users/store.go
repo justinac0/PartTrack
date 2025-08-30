@@ -32,8 +32,8 @@ func (s *UserStore) GetAll(ctx context.Context) ([]User, error) {
 
 func (s *UserStore) GetOne(ctx context.Context, id int64) (*User, error) {
 	user := User{}
-	row := s.db.QueryRowContext(ctx, "SELECT * FROM users WHERE id = $1", id)
-	err := row.Scan(&user.Id, &user.Username, &user.PasswordHash, &user.Role, &user.Created, &user.Deleted)
+	row := s.db.QueryRowContext(ctx, "SELECT  id, email, username, password_hash, role, created_at, deleted_at FROM users WHERE id = $1", id)
+	err := row.Scan(&user.Id, &user.Email, &user.Username, &user.PasswordHash, &user.Role, &user.Created, &user.Deleted)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +55,8 @@ func (s *UserStore) Update(ctx context.Context, id int64, data User) (*User, err
 
 func (s *UserStore) GetByUsername(ctx context.Context, username string) (*User, error) {
 	user := User{}
-	row := s.db.QueryRowContext(ctx, "SELECT id, username, password_hash, role, created, deleted FROM users WHERE username = $1", username)
-	err := row.Scan(&user.Id, &user.Username, &user.PasswordHash, &user.Role, &user.Created, &user.Deleted)
+	row := s.db.QueryRowContext(ctx, "SELECT id, email, username, password_hash, role, created_at, deleted_at FROM users WHERE username = $1", username)
+	err := row.Scan(&user.Id, &user.Email, &user.Username, &user.PasswordHash, &user.Role, &user.Created, &user.Deleted)
 	if err != nil {
 		return nil, err
 	}

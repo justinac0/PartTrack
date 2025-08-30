@@ -5,7 +5,6 @@ import (
 	"PartTrack/internal/resource/users"
 	"context"
 	"errors"
-	"log"
 	"net/http"
 	"time"
 
@@ -16,7 +15,8 @@ func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := CheckSession(c)
 		if err != nil {
-			return c.NoContent(http.StatusInternalServerError)
+			c.Request().Header.Add("HX-Redirect", "/")
+			return c.NoContent(http.StatusNetworkAuthenticationRequired)
 		}
 
 		return next(c)
@@ -24,21 +24,27 @@ func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func CheckSession(c echo.Context) error {
-	cookie, err := c.Cookie("session")
-	if err == nil {
-		return errors.New("session does not exist")
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
+	cookie, err := c.Cookie("session")
+	if err != nil {
+		return errors.New("session does not exist")
+	}
+
 	sessionStore := sessions.NewStore()
-	session, err := sessionStore.GetBySessionID(ctx, cookie.Value)
+	session, err := sessionStore.GetBySessionId(ctx, cookie.Value)
 	if err != nil {
 		return err
 	}
 
-	log.Println(session)
+	if cookie.Value != session.SessionId {
+		return errors.New("session id's don't match")
+	}
+
+	if cookie.Expires.Before(*session.Expiry) {
+		return errors.New("session has expired")
+	}
 
 	return nil
 }

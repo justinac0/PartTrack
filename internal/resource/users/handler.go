@@ -2,8 +2,8 @@ package users
 
 import (
 	"PartTrack/internal/db"
+	"PartTrack/internal/resource/sessions"
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -39,32 +39,50 @@ func (h *Handler) SignIn(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
-	passHash, err := hashPassword(password)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(passHash)
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
 	user, err := h.store.GetByUsername(ctx, username)
 	if err != nil {
-		log.Println("user does not exist")
+		log.Println(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	if !verifyPassword(password, user.PasswordHash) {
-		log.Println("password incorrect")
 		c.NoContent(http.StatusInternalServerError)
 	}
+
+	// create session
+	expiry := time.Now().Add(time.Second * 30)
+	now := time.Now()
+
+	sessionStore := sessions.NewStore()
+	session, err := sessionStore.Create(ctx, sessions.Session{
+		UserId:    user.Id,
+		SessionId: "default key",
+		Expiry:    &expiry,
+		Created:   &now,
+	})
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	cookie := http.Cookie{
+		Name:  "session",
+		Value: session.SessionId,
+	}
+	c.SetCookie(&cookie)
 
 	c.Response().Header().Add("HX-Redirect", "/dashboard")
 	return c.NoContent(http.StatusOK)
 }
 
 func (h *Handler) SignOut(c echo.Context) error {
+	// passHash, err := hashPassword(password)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
 	return c.NoContent(http.StatusOK)
 }
 

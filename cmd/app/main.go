@@ -16,7 +16,7 @@ func InitEcho() *echo.Echo {
 		Format: "${method} ${uri} ${status}\n",
 	}))
 	e.Use(middleware.RemoveTrailingSlash())
-	e.Use(middleware.Recover())
+	// e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
 	e.Static("static/", "static/")

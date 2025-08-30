@@ -22,10 +22,14 @@ func indexPage(c echo.Context) error {
 	err := auth.CheckSession(c)
 	if err == nil {
 		c.Request().Header.Add("HX-Redirect", "/dashboard")
-		return c.NoContent(http.StatusOK)
+		return render(c, http.StatusOK, templates.DashboardPage())
 	}
 
 	return render(c, http.StatusOK, templates.IndexPage())
+}
+
+func dashboardPage(c echo.Context) error {
+	return render(c, http.StatusOK, templates.DashboardPage())
 }
 
 func Setup(e *echo.Echo) {
@@ -37,7 +41,5 @@ func Setup(e *echo.Echo) {
 	auth.Setup(e, userHandler, sessionHandler)
 
 	e.GET("/", indexPage)
-	e.GET("/dashboard", auth.Middleware(func(c echo.Context) error {
-		return c.String(http.StatusOK, "dashboard")
-	}))
+	e.GET("/dashboard", auth.Middleware(dashboardPage))
 }
