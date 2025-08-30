@@ -41,7 +41,7 @@ func DashboardPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>Dashboard</h1><p><span hx-get=\"/who-am-i\" hx-trigger=\"load\" hx-swap=\"innerHTML\"></span></p><button hx-post=\"/signout\" hx-swap=\"none\" hx-trigger=\"click\">Signout</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"menu\"><a href=\"/components\">Components</a> <a href=\"/bom\">BOM</a> <a href=\"/products\">Products</a> <a href=\"/issues\">Issues</a><div style=\"display: flex; gap: 1em;\"><p>logged in: <span hx-get=\"/who-am-i\" hx-trigger=\"load\" hx-swap=\"innerHTML\"></span></p><button hx-post=\"/signout\" hx-swap=\"none\" hx-trigger=\"click\">Signout</button></div></div><br><div><h1>Dashboard</h1></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

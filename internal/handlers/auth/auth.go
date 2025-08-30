@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Middleware(next echo.HandlerFunc, roles []users.UserRole) echo.HandlerFunc {
+func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := users.ValidateSession(c)
 		if err != nil {

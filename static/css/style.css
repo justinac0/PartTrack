@@ -56,3 +56,21 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-weight: bolder;
 }
+
+.menu {
+    display: flex;
+    gap: 1em;
+}
+
+.menu > a {
+    background-color: var(--blue-grey-700);
+    padding: 1em;
+    color: var(--grey-100);
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.menu > a:hover {
+    background-color: var(--blue-grey-400);
+}

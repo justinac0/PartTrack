@@ -45,5 +45,5 @@ func Setup(e *echo.Echo) {
 	auth.Setup(e, userHandler, sessionHandler)
 
 	e.GET("/", indexPage)
-	e.GET("/dashboard", auth.Middleware(dashboardPage, nil))
+	e.GET("/dashboard", auth.Middleware(dashboardPage))
 }

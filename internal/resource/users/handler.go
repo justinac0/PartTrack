@@ -1,6 +1,7 @@
 package users
 
 import (
+	"PartTrack/internal/crypt"
 	"PartTrack/internal/resource/sessions"
 	"context"
 	"fmt"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Handler struct {
@@ -24,24 +24,9 @@ func NewHandler() *Handler {
 	}
 }
 
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(bytes), err
-}
-
-func verifyPassword(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
 // delete old session in db if exists, creates new one and sets browsers cookie
 func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 	sessionStore := sessions.NewStore()
-	// session, err := sessionStore.GetByUserId(ctx, userId)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
 	err := sessionStore.Delete(ctx, userId)
 	if err != nil {
 		panic(err)
@@ -49,7 +34,7 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 
 	// TODO: write helper for session creation
 	// create session
-	expiry := time.Now().Add(time.Second * 10).UTC()
+	expiry := time.Now().Add(time.Hour * 24).UTC()
 	now := time.Now().UTC()
 
 	sessionId := uuid.New()
@@ -69,8 +54,8 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 		Value:   session.SessionId,
 		Expires: *session.ExpiresAt,
 		// TODO: needs to support the following cookie attributes in prod
-		// HttpOnly: true,
-		// Secure: true,
+		HttpOnly: true,
+		Secure:   true,
 	}
 
 	c.SetCookie(&cookie)
@@ -90,7 +75,7 @@ func (h *Handler) SignIn(c echo.Context) error {
 		return c.String(http.StatusOK, "incorrect username/password")
 	}
 
-	if !verifyPassword(password, user.PasswordHash) {
+	if !crypt.VerifyPassword(password, user.PasswordHash) {
 		return c.String(http.StatusOK, "incorrect username/password")
 	}
 
@@ -127,7 +112,7 @@ func (h *Handler) Register(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
-	passHash, err := hashPassword(password)
+	passHash, err := crypt.HashPassword(password)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
@@ -177,6 +162,9 @@ func (h *Handler) GetUserById(c echo.Context) error {
 }
 
 func (h *Handler) WhoAmI(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
 	if ValidateSession(c) != nil {
 		c.Response().Header().Set("HX-Redirect", "/")
 		return c.NoContent(http.StatusUnauthorized)
@@ -187,9 +175,6 @@ func (h *Handler) WhoAmI(c echo.Context) error {
 		c.Response().Header().Set("HX-Redirect", "/")
 		return c.NoContent(http.StatusUnauthorized)
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
 
 	sessionStore := sessions.NewStore()
 	session, err := sessionStore.GetBySessionId(ctx, cookie.Value)
