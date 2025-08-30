@@ -4,6 +4,7 @@ import (
 	"PartTrack/internal/db"
 	"PartTrack/internal/resource/sessions"
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -36,6 +37,11 @@ func verifyPassword(password, hash string) bool {
 }
 
 func (h *Handler) SignIn(c echo.Context) error {
+	if sessions.ValidateSession(c) == nil {
+		c.Response().Header().Add("HX-Redirect", "/dashboard")
+		return c.NoContent(http.StatusOK)
+	}
+
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
@@ -52,11 +58,17 @@ func (h *Handler) SignIn(c echo.Context) error {
 		c.NoContent(http.StatusInternalServerError)
 	}
 
-	// create session
-	expiry := time.Now().Add(time.Second * 30)
-	now := time.Now()
-
 	sessionStore := sessions.NewStore()
+	err = sessionStore.Delete(ctx, user.Id)
+	if err != nil {
+		fmt.Println("[err]: ", err)
+	}
+
+	// TODO: write helper for session creation
+	// create session
+	expiry := time.Now().Add(time.Second * 20).UTC()
+	now := time.Now().UTC()
+
 	session, err := sessionStore.Create(ctx, sessions.Session{
 		UserId:    user.Id,
 		SessionId: "default key",
@@ -68,8 +80,12 @@ func (h *Handler) SignIn(c echo.Context) error {
 	}
 
 	cookie := http.Cookie{
-		Name:  "session",
-		Value: session.SessionId,
+		Name:    "session",
+		Value:   session.SessionId,
+		Expires: *session.Expiry,
+		// TODO: needs to support the following cookie attributes in prod
+		// HttpOnly: true,
+		// Secure: true,
 	}
 	c.SetCookie(&cookie)
 
@@ -87,7 +103,7 @@ func (h *Handler) SignOut(c echo.Context) error {
 }
 
 func (h *Handler) GetUserById(c echo.Context) error {
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
@@ -95,12 +111,10 @@ func (h *Handler) GetUserById(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	user, err := h.store.GetOne(ctx, id)
+	_, err = h.store.GetOne(ctx, id)
 	if err != nil {
 		panic(err)
 	}
-
-	log.Println(user)
 
 	return c.NoContent(http.StatusOK)
 }
@@ -109,12 +123,10 @@ func (h *Handler) GetUsers(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	users, err := h.store.GetAll(ctx)
+	_, err := h.store.GetAll(ctx)
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	log.Println(users)
 
 	return c.NoContent(http.StatusOK)
 }

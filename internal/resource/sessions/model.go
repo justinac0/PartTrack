@@ -6,7 +6,7 @@ import (
 
 type Session struct {
 	SessionId string     `json:"session_id"`
-	UserId    int64      `json:"user_id"`
+	UserId    uint64     `json:"user_id"`
 	Expiry    *time.Time `json:"expiry"`
 	Created   *time.Time `json:"created"`
 }

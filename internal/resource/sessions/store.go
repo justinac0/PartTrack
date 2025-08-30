@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 type SessionStore struct {
@@ -59,10 +60,21 @@ func (s *SessionStore) Create(ctx context.Context, data Session) (*Session, erro
 	return &data, nil
 }
 
-// func (s *SessionStore) Delete(ctx context.Context, id int64, data Session) (*Session, error) {
-// 	return nil, nil
-// }
+func (s *SessionStore) Delete(ctx context.Context, user_id uint64) error {
+	statement, err := s.db.PrepareContext(
+		ctx,
+		`DELETE FROM sessions WHERE user_id = $1`)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
 
-// func (s *SessionStore) Update(ctx context.Context, id int64, data Session) (*Session, error) {
-// 	return nil, nil
-// }
+	result, err := statement.ExecContext(ctx, user_id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(result)
+
+	return nil
+}

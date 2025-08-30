@@ -30,7 +30,7 @@ func (s *UserStore) GetAll(ctx context.Context) ([]User, error) {
 	return users, nil
 }
 
-func (s *UserStore) GetOne(ctx context.Context, id int64) (*User, error) {
+func (s *UserStore) GetOne(ctx context.Context, id uint64) (*User, error) {
 	user := User{}
 	row := s.db.QueryRowContext(ctx, "SELECT  id, email, username, password_hash, role, created_at, deleted_at FROM users WHERE id = $1", id)
 	err := row.Scan(&user.Id, &user.Email, &user.Username, &user.PasswordHash, &user.Role, &user.Created, &user.Deleted)
@@ -39,18 +39,6 @@ func (s *UserStore) GetOne(ctx context.Context, id int64) (*User, error) {
 	}
 
 	return &user, err
-}
-
-func (s *UserStore) Create(ctx context.Context, data User) (*User, error) {
-	return nil, nil
-}
-
-func (s *UserStore) Delete(ctx context.Context, id int64, data User) (*User, error) {
-	return nil, nil
-}
-
-func (s *UserStore) Update(ctx context.Context, id int64, data User) (*User, error) {
-	return nil, nil
 }
 
 func (s *UserStore) GetByUsername(ctx context.Context, username string) (*User, error) {

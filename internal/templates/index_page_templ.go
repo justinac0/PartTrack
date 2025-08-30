@@ -41,7 +41,7 @@ func IndexPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form id=\"signin\" hx-post=\"/signin\" hx-swap=\"none\"><h1>PartTrack 💻</h1><hr><br><label>Username</label><br><input type=\"text\" name=\"username\" width=\"100%\" required><br><br><label>Password</label><br><input type=\"password\" name=\"password\" width=\"100%\" required><br><br><button type=\"submit\" value=\"submit\">Signin</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>PartTrack 💻</h1><div><form id=\"signin\" hx-post=\"/signin\" hx-swap=\"none\"><label>Username</label><br><input type=\"text\" name=\"username\" width=\"100%\" required><br><br><label>Password</label><br><input type=\"password\" name=\"password\" width=\"100%\" required><br><br><button type=\"submit\" value=\"submit\">Signin</button></form></div><br><hr><h2>Register</h2><div><form id=\"register\" hx-post=\"/register\" hx-swap=\"none\"><label>Email</label><br><input type=\"email\" name=\"email\" required><br><br><label>Username</label><br><input type=\"text\" name=\"username\" required><br><br><label>Password</label><br><input type=\"password\" name=\"password\" required><br><br><button type=\"submit\" value=\"submit\">Register</button></form></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
