@@ -1,6 +1,7 @@
 package users
 
 import (
+	"PartTrack/internal/db"
 	"context"
 	"database/sql"
 	"fmt"
@@ -8,6 +9,12 @@ import (
 
 type UserStore struct {
 	db *sql.DB
+}
+
+func NewStore() *UserStore {
+	return &UserStore{
+		db: db.GetHandle(),
+	}
 }
 
 func (s *UserStore) GetAll(ctx context.Context) ([]User, error) {

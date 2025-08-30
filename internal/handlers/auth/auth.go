@@ -10,7 +10,7 @@ import (
 
 func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		err := sessions.ValidateSession(c)
+		err := users.ValidateSession(c)
 		if err != nil {
 			return c.NoContent(http.StatusUnauthorized)
 		}
@@ -23,4 +23,5 @@ func Setup(e *echo.Echo, userHandler *users.Handler, sessionHandler *sessions.Ha
 	e.POST("/signin", userHandler.SignIn)
 	e.POST("/signout", userHandler.SignOut)
 	e.POST("/register", userHandler.Register)
+	e.GET("/who-am-i", userHandler.WhoAmI)
 }

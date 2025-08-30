@@ -1,7 +1,6 @@
 package users
 
 import (
-	"PartTrack/internal/db"
 	"PartTrack/internal/resource/sessions"
 	"context"
 	"fmt"
@@ -19,9 +18,7 @@ type Handler struct {
 
 func NewHandler() *Handler {
 	return &Handler{
-		store: &UserStore{
-			db: db.GetHandle(),
-		},
+		store: NewStore(),
 	}
 }
 
@@ -50,7 +47,7 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 
 	session, err := sessionStore.Create(ctx, sessions.Session{
 		UserId:    userId,
-		SessionId: "default key", // TODO: generate unique
+		SessionId: fmt.Sprintf("%s", userId), // TODO: generate unique
 		Expiry:    &expiry,
 		Created:   &now,
 	})
@@ -68,15 +65,12 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 	}
 
 	c.SetCookie(&cookie)
+
+	fmt.Println("created cookie")
 	return nil
 }
 
 func (h *Handler) SignIn(c echo.Context) error {
-	if sessions.ValidateSession(c) == nil {
-		c.Response().Header().Set("HX-Redirect", "/dashboard")
-		return c.NoContent(http.StatusOK)
-	}
-
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
@@ -144,8 +138,7 @@ func (h *Handler) Register(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	c.Response().Header().Set("HX-Redirect", "/")
-	return c.NoContent(http.StatusOK)
+	return c.String(http.StatusCreated, "account created, you can signin now!")
 }
 
 func (h *Handler) GetUserById(c echo.Context) error {
@@ -175,4 +168,72 @@ func (h *Handler) GetUsers(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusOK)
+}
+
+func (h *Handler) WhoAmI(c echo.Context) error {
+	if ValidateSession(c) != nil {
+		c.Response().Header().Set("HX-Redirect", "/")
+		return c.NoContent(http.StatusUnauthorized)
+	}
+
+	cookie, err := c.Cookie("session")
+	if err != nil {
+		c.Response().Header().Set("HX-Redirect", "/")
+		return c.NoContent(http.StatusUnauthorized)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	sessionStore := sessions.NewStore()
+	session, err := sessionStore.GetBySessionId(ctx, cookie.Value)
+	if err != nil {
+		c.Response().Header().Set("HX-Redirect", "/")
+		return c.NoContent(http.StatusUnauthorized)
+	}
+
+	user, err := h.store.GetOne(ctx, session.UserId)
+	if err != nil {
+		c.Response().Header().Set("HX-Redirect", "/")
+		return c.NoContent(http.StatusUnauthorized)
+	}
+
+	return c.String(http.StatusOK, user.Username)
+}
+
+func ValidateSession(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	cookie, err := c.Cookie("session")
+	if err != nil {
+		return sessions.SessionCookieNotSet
+	}
+
+	sessionStore := sessions.NewStore()
+	session, err := sessionStore.GetBySessionId(ctx, cookie.Value)
+	if err != nil {
+		return sessions.SessionNotFound
+	}
+
+	userStore := NewStore()
+	user, err := userStore.GetOne(ctx, session.UserId)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(user.Id, session.UserId)
+	if user.Id != session.UserId {
+		return sessions.SessionNotFound
+	}
+
+	if cookie.Value != session.SessionId {
+		return sessions.SessionIdInvalid
+	}
+
+	if time.Now().After(*session.Expiry) {
+		return sessions.SessionExpired
+	}
+
+	return nil
 }

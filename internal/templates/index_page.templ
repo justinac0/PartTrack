@@ -17,13 +17,13 @@ templ IndexPage() {
                 <br>
                 <button type="submit" value="submit">Signin</button>
             </form>
+            <p id="signin-status" style="color: red;"></p>
         </div>
-        <p id="signin-status" style="color: red;"></p>
         <br>
         <hr>
         <h2>Register</h2>
         <div>
-            <form id="register" hx-post="/register" hx-swap="none">
+            <form id="register" hx-post="/register" hx-swap="innerHTML" hx-target="#register-status">
             <label>Email</label>
             <br>
             <input type="email" name="email" required/>
@@ -41,6 +41,7 @@ templ IndexPage() {
             <br>
             <button type="submit" value="submit">Register</button>
         </form>
+            <p id="register-status" style="color: gray;"></p>
     </div>
 
     }
