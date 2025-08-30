@@ -32,10 +32,6 @@ func dashboardPage(c echo.Context) error {
 	return render(c, http.StatusOK, templates.DashboardPage())
 }
 
-func adminPage(c echo.Context) error {
-	return render(c, http.StatusOK, templates.AdminPage())
-}
-
 func Setup(e *echo.Echo) {
 	db.Init()
 

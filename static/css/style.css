@@ -2,10 +2,7 @@
  * https://materialui.co/colors
  */
 :root {
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-
-    margin: 0;
-    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     /* RED */
     --red-50: #FFEBEE;
@@ -49,7 +46,9 @@
 }
 
 body {
-    background-color: var(--grey-200);
+    margin: 0;
+    padding: 0;
+    background-color: var(--grey-300);
     color: var(--grey-900);
 }
 
@@ -58,19 +57,30 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .menu {
+    background-color: var(--grey-50);
     display: flex;
-    gap: 1em;
+    gap: 2.5ch;
+    flex-direction: row;
+    padding: 1em;
+    border-radius: 0 0 5px 5px;
+}
+
+.menu > * {
+    font-size: large;
+    margin: 0;
 }
 
 .menu > a {
-    background-color: var(--blue-grey-700);
-    padding: 1em;
-    color: var(--grey-100);
     text-transform: uppercase;
     text-decoration: none;
     font-weight: bold;
 }
 
 .menu > a:hover {
-    background-color: var(--blue-grey-400);
+    transform: translateY(2px);
+    cursor: pointer;
+}
+
+.container {
+    margin: 0 10% auto;
 }
