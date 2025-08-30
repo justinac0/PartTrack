@@ -32,6 +32,10 @@ func dashboardPage(c echo.Context) error {
 	return render(c, http.StatusOK, templates.DashboardPage())
 }
 
+func adminPage(c echo.Context) error {
+	return render(c, http.StatusOK, templates.AdminPage())
+}
+
 func Setup(e *echo.Echo) {
 	db.Init()
 
@@ -41,5 +45,6 @@ func Setup(e *echo.Echo) {
 	auth.Setup(e, userHandler, sessionHandler)
 
 	e.GET("/", indexPage)
+	e.GET("/admin", auth.Middleware(adminPage))
 	e.GET("/dashboard", auth.Middleware(dashboardPage))
 }

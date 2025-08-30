@@ -1,8 +1,8 @@
 package templates
 
-templ DashboardPage() {
-    @BaseLayout("Dashboard") {
-        <h1>Dashboard</h1>
+templ AdminPage() {
+    @BaseLayout("Admin") {
+        <h1>Admin</h1>
     	<p><span hx-get="/who-am-i" hx-trigger="load" hx-swap="innerHTML"></span></p>
         <button hx-post="/signout" hx-swap="none" hx-trigger="click">Signout</button>
     }

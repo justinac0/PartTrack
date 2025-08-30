@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -45,9 +47,11 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 	expiry := time.Now().Add(time.Hour * 24).UTC()
 	now := time.Now().UTC()
 
+	sessionId := uuid.New()
+
 	session, err := sessionStore.Create(ctx, sessions.Session{
 		UserId:    userId,
-		SessionId: fmt.Sprintf("%s", userId), // TODO: generate unique
+		SessionId: sessionId.String(), // TODO: generate unique
 		Expiry:    &expiry,
 		Created:   &now,
 	})
@@ -89,6 +93,11 @@ func (h *Handler) SignIn(c echo.Context) error {
 	err = recreateSession(c, ctx, user.Id)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	if user.Role == RoleAdmin {
+		c.Response().Header().Set("HX-Redirect", "/admin")
+		return c.NoContent(http.StatusOK)
 	}
 
 	c.Response().Header().Set("HX-Redirect", "/dashboard")
@@ -198,7 +207,7 @@ func (h *Handler) WhoAmI(c echo.Context) error {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	return c.String(http.StatusOK, user.Username)
+	return c.String(http.StatusOK, fmt.Sprintf("%s [%s]", user.Username, strings.ToUpper(string(user.Role))))
 }
 
 func ValidateSession(c echo.Context) error {

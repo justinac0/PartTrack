@@ -11,7 +11,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE sessions (
-    session_id VARCHAR(64) NOT NULL,
+    session_id UUID DEFAULT gen_random_uuid(),
     user_id INT UNIQUE NOT NULL,
     expires_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

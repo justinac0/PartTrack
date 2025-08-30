@@ -3,6 +3,7 @@ package auth
 import (
 	"PartTrack/internal/resource/sessions"
 	"PartTrack/internal/resource/users"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -12,6 +13,7 @@ func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := users.ValidateSession(c)
 		if err != nil {
+			fmt.Println(err)
 			return c.NoContent(http.StatusUnauthorized)
 		}
 
