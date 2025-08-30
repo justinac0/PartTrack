@@ -1,7 +1,7 @@
 CREATE TYPE USER_ROLE AS ENUM ('guest', 'customer', 'employee', 'admin');
 
 CREATE TABLE users (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     email VARCHAR(128) UNIQUE NOT NULL,
     username VARCHAR(32) NOT NULL,
     password_hash VARCHAR(128) NOT NULL,
@@ -20,5 +20,5 @@ CREATE TABLE sessions (
 );
 
 CREATE TABLE components (
-    id INT PRIMARY KEY
+    id SERIAL PRIMARY KEY
 );

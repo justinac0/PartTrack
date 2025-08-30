@@ -22,7 +22,5 @@ func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 func Setup(e *echo.Echo, userHandler *users.Handler, sessionHandler *sessions.Handler) {
 	e.POST("/signin", userHandler.SignIn)
 	e.POST("/signout", userHandler.SignOut)
-	e.GET("/register", func(c echo.Context) error {
-		return c.NoContent(http.StatusOK)
-	})
+	e.POST("/register", userHandler.Register)
 }

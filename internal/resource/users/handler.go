@@ -117,6 +117,37 @@ func (h *Handler) SignOut(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+func (h *Handler) Register(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	email := c.FormValue("email")
+	username := c.FormValue("username")
+	password := c.FormValue("password")
+
+	passHash, err := hashPassword(password)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	now := time.Now().UTC()
+	user := User{
+		Username:     username,
+		Email:        email,
+		PasswordHash: passHash,
+		Role:         RoleGuest,
+		CreatedAt:    &now,
+	}
+
+	_, err = h.store.Create(ctx, user)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	c.Response().Header().Set("HX-Redirect", "/")
+	return c.NoContent(http.StatusOK)
+}
+
 func (h *Handler) GetUserById(c echo.Context) error {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {

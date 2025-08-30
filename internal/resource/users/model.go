@@ -7,10 +7,10 @@ import (
 type UserRole string
 
 const (
-	GUEST    UserRole = "guest"
-	CUSTOMER UserRole = "customer"
-	EMPLOYEE UserRole = "employee"
-	ADMIN    UserRole = "admin"
+	RoleGuest    UserRole = "guest"
+	RoleCustomer UserRole = "customer"
+	RoleEmployee UserRole = "employee"
+	RoleAdmin    UserRole = "admin"
 )
 
 type User struct {
@@ -19,6 +19,6 @@ type User struct {
 	Username     string     `json:"username"`
 	PasswordHash string     `json:"password_hash"`
 	Role         UserRole   `json:"role"`
-	Created      *time.Time `json:"created_at"`
-	Deleted      *time.Time `json:"deleted_at"`
+	CreatedAt    *time.Time `json:"created_at"`
+	DeletedAt    *time.Time `json:"deleted_at"`
 }
