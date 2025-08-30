@@ -21,7 +21,7 @@ func render(c echo.Context, status int, t templ.Component) error {
 func indexPage(c echo.Context) error {
 	err := sessions.ValidateSession(c)
 	if err == nil {
-		c.Request().Header.Add("HX-Redirect", "/dashboard")
+		c.Response().Header().Set("HX-Redirect", "/dashboard")
 		return render(c, http.StatusOK, templates.DashboardPage())
 	}
 
