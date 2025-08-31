@@ -112,11 +112,11 @@ func (h *Handler) Register(c echo.Context) error {
 	email := c.FormValue("email")
 	username := c.FormValue("username")
 	password := c.FormValue("password")
-	// retry_password := c.FormValue("retry_password")
+	retry_password := c.FormValue("retry_password")
 
-	// if password != retry_password {
-	// 	return c.String(http.StatusBadRequest, "passwords don't match")
-	// }
+	if password != retry_password {
+		return c.String(http.StatusOK, "passwords don't match")
+	}
 
 	passHash, err := crypt.HashPassword(password)
 	if err != nil {
