@@ -11,7 +11,7 @@ templ ComponentTable(page *internal.Page[model.Component]) {
             for i := max(0, page.PageCount-5); i < min(page.PageCount + 5, page.MaxPage); i++ {
                 if i >= 0 {
                     if i == page.PageCount {
-                        <button style="font-weight: bolder; border: 4px solid black;" hx-get={ fmt.Sprintf("/protected/components/page/%d", i) } hx-target="#components" hx-swap="outerHTML">{i}</button>
+                        <button style="font-weight: bolder; text-decoration: underline;" hx-get={ fmt.Sprintf("/protected/components/page/%d", i) } hx-target="#components" hx-swap="outerHTML">{i}</button>
                     } else {
                         <button hx-get={ fmt.Sprintf("/protected/components/page/%d", i) } hx-target="#components" hx-swap="outerHTML">{i}</button>
                     }

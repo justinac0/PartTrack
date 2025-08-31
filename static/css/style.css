@@ -68,14 +68,31 @@ a:hover {
 }
 
 .menu {
-    background-color: var(--grey-50);
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
     display: flex;
     gap: 2.5ch;
     flex-direction: row;
     padding: 1em;
-    border-radius: 0 0 5px 5px;
+    border: 0;
+    border-bottom: 1px;
+    border-style: solid;
+    border-color: var(--blue-grey-200);
+    position: sticky;
+    top: 0;
+    width: 100%;
 }
 
+button {
+    padding: 1em;
+    border: 1px solid var(--blue-grey-100);
+    background-color: var(--blue-grey-700);
+    color: var(--grey-100);
+    border-radius: 5px;
+    font-weight: bold;
+}
 
 table {
   border-collapse: collapse;
