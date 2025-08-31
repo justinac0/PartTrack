@@ -34,30 +34,17 @@ func (s *ComponentStore) GetOne(ctx context.Context, id uint64) (*model.Componen
 
 func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search string) (*internal.Page[model.Component], error) {
 	searchIncluded := len(search) > 0
-	var filter string
-	var filterCount string
-
-	if searchIncluded {
-		filter = fmt.Sprintf(`SELECT id, added_by, name, description, footprint, manufacturer, supplier, amount, created_at, deleted_at FROM components
-			WHERE id::text LIKE '%%%s%%'
-			OR name LIKE '%%%s%%'
-			OR description LIKE '%%%s%%'
-			OR footprint LIKE '%%%s%%'
-			OR manufacturer LIKE '%%%s%%'
-			OR supplier LIKE '%%%s%%'`, search, search, search, search, search, search)
-
-		filterCount = fmt.Sprintf(`SELECT COUNT(*) FROM components
-			WHERE id::text LIKE '%%%s%%'
-			OR name LIKE '%%%s%%'
-			OR description LIKE '%%%s%%'
-			OR footprint LIKE '%%%s%%'
-			OR manufacturer LIKE '%%%s%%'
-			OR supplier LIKE '%%%s%%';`, search, search, search, search, search, search)
-	}
 
 	var countRow *sql.Row
 	if searchIncluded {
-		countRow = s.db.QueryRowContext(ctx, filterCount)
+		countRow = s.db.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM components
+			WHERE id::text LIKE '%' || $1 || '%'
+			OR name LIKE '%' || $1 || '%'
+			OR description LIKE '%' || $1 || '%'
+			OR footprint LIKE '%' || $1 || '%'
+			OR manufacturer LIKE '%' || $1 || '%'
+			OR supplier LIKE '%' || $1 || '%';`, search)
 	} else {
 		countRow = s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM components;")
 	}
@@ -78,10 +65,16 @@ func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search 
 	}
 
 	rowOffset := offset * internal.PAGINATION_COUNT
-
 	var rows *sql.Rows
 	if searchIncluded {
-		rows, err = s.db.QueryContext(ctx, fmt.Sprintf(`%s LIMIT $1 OFFSET $2;`, filter), internal.PAGINATION_COUNT, rowOffset)
+		rows, err = s.db.QueryContext(ctx,
+			`SELECT COUNT(*) FROM components
+			WHERE id::text LIKE '%' || $1 || '%'
+			OR name LIKE '%' || $1 || '%'
+			OR description LIKE '%' || $1 || '%'
+			OR footprint LIKE '%' || $1 || '%'
+			OR manufacturer LIKE '%' || $1 || '%'
+			OR supplier LIKE '%' || $1 || '%' LIMIT $2 OFFSET $3`, search, internal.PAGINATION_COUNT, rowOffset)
 	} else {
 		rows, err = s.db.QueryContext(ctx, `SELECT * FROM components LIMIT $1 OFFSET $2;`, internal.PAGINATION_COUNT, rowOffset)
 	}
@@ -93,6 +86,7 @@ func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search 
 		var comp model.Component
 		err := rows.Scan(&comp.Id, &comp.AddedBy, &comp.Name, &comp.Description, &comp.Footprint, &comp.Manufacturer, &comp.Supplier, &comp.Amount, &comp.CreatedAt, &comp.DeletedAt)
 		if err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
 		list.Items = append(list.Items, comp)

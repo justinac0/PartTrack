@@ -31,4 +31,4 @@ func (p *Page[T]) PrevPageIndex() int64 {
 	return max(p.Offset-1, 0)
 }
 
-const PAGINATION_COUNT = 100
+const PAGINATION_COUNT = 50
