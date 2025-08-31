@@ -1,0 +1,16 @@
+# Ignore secrets and sensitive files
+.env
+
+# Ignore git directory and files
+.git/
+.gitignore
+
+# Ignore Dockerfile and docker-compose files
+Dockerfile
+compose.yaml
+
+# Ignore non-source files
+README.md
+
+# Ignore database files
+sql/

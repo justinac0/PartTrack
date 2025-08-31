@@ -4,37 +4,20 @@ package db
 import (
 	"database/sql"
 	"errors"
-	"fmt"
+	"os"
 
-	"github.com/caarlos0/env/v11"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
-
-type config struct {
-	User string `env:"DBUSER"`
-	Pass string `env:"DBPASS"`
-	Host string `env:"DBHOST"`
-	Name string `env:"DBNAME"`
-}
 
 var handle *sql.DB
 
 func getConnString() (string, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return "", err
+	connectionString := os.Getenv("DATABASE_URL")
+	if connectionString == "" {
+		return "", errors.New("DATABASE_URL not set")
 	}
 
-	var cfg config
-	err = env.Parse(&cfg)
-	if err != nil {
-		return "", err
-	}
-
-	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", cfg.User, cfg.Pass, cfg.Host, cfg.Name)
-
-	return connStr, nil
+	return connectionString, nil
 }
 
 func Init() error {
