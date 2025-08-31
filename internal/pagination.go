@@ -1,6 +1,8 @@
 package internal
 
-import "math"
+import (
+	"math"
+)
 
 type Page[T any] struct {
 	Items       []T
@@ -18,7 +20,11 @@ func (p *Page[T]) GetMaxPages() int64 {
 }
 
 func (p *Page[T]) NextPageIndex() int64 {
-	return min(p.Offset+1, p.ResultCount)
+	if (p.Offset+1)*PAGINATION_COUNT > p.ResultCount {
+		return p.Offset
+	}
+
+	return p.Offset + 1
 }
 
 func (p *Page[T]) PrevPageIndex() int64 {

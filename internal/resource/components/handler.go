@@ -69,7 +69,6 @@ func (h *Handler) ViewComponents(c echo.Context) error {
 
 	page, err := h.store.GetPaginated(ctx, int64(id), search)
 	if err != nil {
-		fmt.Println(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
