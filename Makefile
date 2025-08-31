@@ -2,11 +2,11 @@
 
 DOCKER_COMPOSE_ARGS := --project-name part-tracker
 
-all:
-	docker compose $(DOCKER_COMPOSE_ARGS) up --detached --build
-
 dev:
 	docker compose $(DOCKER_COMPOSE_ARGS) watch
+
+all:
+	docker compose $(DOCKER_COMPOSE_ARGS) up --detached --build
 
 logs:
 	docker compose $(DOCKER_COMPOSE_ARGS) logs -f

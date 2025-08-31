@@ -96,6 +96,10 @@ button {
     font-weight: bold;
 }
 
+button:hover {
+    cursor: pointer;
+}
+
 table {
   border-collapse: collapse;
   border-radius: 5px;
@@ -153,4 +157,8 @@ tr:hover {
 }
 .htmx-request.htmx-indicator{
     opacity:1;
+}
+
+input[text] {
+    padding: 1em;
 }

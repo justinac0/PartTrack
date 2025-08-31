@@ -8,7 +8,7 @@ templ DashboardMenu() {
         <a href="/protected/products">Products</a>
         <a href="/protected/issues">Issues</a>
         <p style="color: var(--grey-600);">
-            <span hx-get="/auth/who-am-i" hx-trigger="load" hx-swap="innerHTML"></span>
+            <span hx-get="/auth/who-am-i" hx-trigger="load" hx-swap="innerHTML">...</span>
         </p>
         <a hx-post="/auth/signout" hx-swap="none">Signout</a>
     </div>

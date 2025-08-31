@@ -64,13 +64,17 @@ func (h *Handler) ViewComponents(c echo.Context) error {
 
 	id, err := strconv.ParseUint(path.Id, 10, 64)
 	if err != nil {
-		fmt.Println(path.Id)
 		return c.NoContent(http.StatusBadRequest)
 	}
 
 	page, err := h.store.GetPaginated(ctx, int64(id), search)
 	if err != nil {
+		fmt.Println(err)
 		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	if len(search) > 0 {
+		page.SearchQuery = search
 	}
 
 	return internal.RenderTempl(c, http.StatusOK, templates.ComponentsPage(page))

@@ -32,40 +32,38 @@ func (s *ComponentStore) GetOne(ctx context.Context, id uint64) (*model.Componen
 	return &comp, nil
 }
 
-func (s *ComponentStore) GetPaginated(ctx context.Context, page int64, search string) (*internal.Page[model.Component], error) {
+func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search string) (*internal.Page[model.Component], error) {
 	searchIncluded := len(search) > 0
-	// var filter string
-	// var filterCount string
+	var filter string
+	var filterCount string
 
-	// // TODO: there has to be a better way to do this
-	// if searchIncluded {
-	// 	filter = fmt.Sprintf(`SELECT id, added_by, name, description, footprint, manufacturer, supplier, amount, created_at, deleted_at FROM components
-	// 		WHERE id::text ~* '%s'
-	// 		OR name ~* '%s'
-	// 		OR description ~* '%s'
-	// 		OR footprint ~* '%s'
-	// 		OR manufacturer ~* '%s'
-	// 		OR supplier ~* '%s'`, search, search, search, search, search, search)
+	if searchIncluded {
+		filter = fmt.Sprintf(`SELECT id, added_by, name, description, footprint, manufacturer, supplier, amount, created_at, deleted_at FROM components
+			WHERE id::text LIKE '%%%s%%'
+			OR name LIKE '%%%s%%'
+			OR description LIKE '%%%s%%'
+			OR footprint LIKE '%%%s%%'
+			OR manufacturer LIKE '%%%s%%'
+			OR supplier LIKE '%%%s%%'`, search, search, search, search, search, search)
 
-	// 	filterCount = fmt.Sprintf(`SELECT COUNT(*) FROM components
-	// 		WHERE id::text ~* '%s'
-	// 		OR name ~* '%s'
-	// 		OR description ~* '%s'
-	// 		OR footprint ~* '%s'
-	// 		OR manufacturer ~* '%s'
-	// 		OR supplier ~* '%s';`, search, search, search, search, search, search)
-	// }
+		filterCount = fmt.Sprintf(`SELECT COUNT(*) FROM components
+			WHERE id::text LIKE '%%%s%%'
+			OR name LIKE '%%%s%%'
+			OR description LIKE '%%%s%%'
+			OR footprint LIKE '%%%s%%'
+			OR manufacturer LIKE '%%%s%%'
+			OR supplier LIKE '%%%s%%';`, search, search, search, search, search, search)
+	}
 
-	// TODO: Ensure SQL injection isn't occuring
 	var countRow *sql.Row
 	if searchIncluded {
-		// countRow = s.db.QueryRowContext(ctx, filterCount)
+		countRow = s.db.QueryRowContext(ctx, filterCount)
 	} else {
 		countRow = s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM components;")
 	}
 
 	var list internal.Page[model.Component]
-	list.PageCount = page
+	list.Offset = offset
 
 	var rowCount int64
 	err := countRow.Scan(&rowCount)
@@ -73,21 +71,21 @@ func (s *ComponentStore) GetPaginated(ctx context.Context, page int64, search st
 		return nil, err
 	}
 
-	list.MaxPage = rowCount / internal.PAGINATION_COUNT
+	list.ResultCount = rowCount
 
-	if page > list.MaxPage {
+	if offset > list.GetMaxPages() {
 		return nil, errors.New("page out of bounds")
 	}
-	var rows *sql.Rows
 
-	offset := page * internal.PAGINATION_COUNT
+	rowOffset := offset * internal.PAGINATION_COUNT
+
+	var rows *sql.Rows
 	if searchIncluded {
-		// rows, err = s.db.QueryContext(ctx, fmt.Sprintf(`%s LIMIT $1 OFFSET $2;`, filter), model.PAGINATION_SIZE, offset)
+		rows, err = s.db.QueryContext(ctx, fmt.Sprintf(`%s LIMIT $1 OFFSET $2;`, filter), internal.PAGINATION_COUNT, rowOffset)
 	} else {
-		rows, err = s.db.QueryContext(ctx, `SELECT * FROM components LIMIT $1 OFFSET $2;`, internal.PAGINATION_COUNT, offset)
+		rows, err = s.db.QueryContext(ctx, `SELECT * FROM components LIMIT $1 OFFSET $2;`, internal.PAGINATION_COUNT, rowOffset)
 	}
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

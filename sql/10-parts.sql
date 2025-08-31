@@ -23,4 +23,4 @@ SELECT
     (ARRAY['Texas Instruments', 'Analog Devices', 'NXP', 'Microchip', 'STMicroelectronics', 'Infineon'])[floor(random() * 6 + 1)] AS manufacturer,
     (ARRAY['Digikey', 'Mouser', 'Arrow', 'RS Components', 'Element14'])[floor(random() * 5 + 1)] AS supplier,
     floor(random() * 100 + 1)::INT AS amount
-FROM generate_series(1, 10000) gs;
+FROM generate_series(1, 100000) gs;

@@ -4,22 +4,34 @@ import (
     "PartTrack/internal"
     "PartTrack/internal/resource/components/model"
 	"PartTrack/internal/templates/components"
+	"fmt"
 )
 
 templ ComponentsPage(page *internal.Page[model.Component]) {
     @DashboardLayout("Components") {
+        {{ nextPage := fmt.Sprintf("/protected/components/page/%d?search=%s", page.NextPageIndex(), page.SearchQuery) }}
+        {{ prevPage := fmt.Sprintf("/protected/components/page/%d?search=%s", page.PrevPageIndex(), page.SearchQuery) }}
+        {{ totalCount := page.ResultCount }}
+        {{ startItem := page.Offset * internal.PAGINATION_COUNT }}
+        {{ endItem := page.Offset * internal.PAGINATION_COUNT + int64(len(page.Items)) }}
+
         <h1>Components</h1>
+        <form hx-get="/protected/components/page/0"
+            hx-trigger="keyup[key=='Enter']"
+            hx-swap="outerHTML"
+            hx-target="body">
         <input
             type="search"
             name="search"
+            value={page.SearchQuery}
             placeholder="Search"
-            hx-post="/protected/components/page/0"
-            hx-trigger="input changed delay:500ms, keyup[key=='Enter']" />
+            autofocus />
+        </form>
         <br>
         <br>
-        <button>prev</button>
-        <button>next</button>
-        <p>results {(page.PageCount+1)*internal.PAGINATION_COUNT} of {page.MaxPage*internal.PAGINATION_COUNT}</p>
+        <button hx-get={ prevPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ prevPage }>prev</button>
+        <button hx-get={ nextPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ nextPage }>next</button>
+        <p>results { startItem } to { endItem } of { totalCount  }</p>
         <table id="components">
             <tr>
                 <th>Id</th>

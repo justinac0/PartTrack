@@ -18,3 +18,12 @@ CREATE TABLE sessions (
 
     CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+
+-- add default user
+-- [user:pass]
+-- admin:admin
+-- test:test
+INSERT INTO "users" ("id", "email", "username", "password_hash", "role", "created_at", "deleted_at") VALUES
+(1,	'admin@gmail.com',	'admin',	'$2a$10$9RL0UWVE29y57k4QohuId.2KxVfhxJ4.nwihulpdn4JPIpheFmMgC',	'admin',	'2025-08-31 10:20:00.511205',	NULL),
+(2,	'test@gmail.com',	'test',	'$2a$10$fbvP1s2Je02iOkpinVo1ZO6ishUFMji9DyvQYI2T.T5cGHOLflSge',	'guest',	'2025-08-31 10:20:39.121888',	NULL);

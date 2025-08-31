@@ -1,9 +1,28 @@
 package internal
 
+import "math"
+
 type Page[T any] struct {
-	Items     []T
-	PageCount int64
-	MaxPage   int64
+	Items       []T
+	Offset      int64
+	ResultCount int64
+	SearchQuery string
 }
 
-const PAGINATION_COUNT = 20
+func (p *Page[T]) GetIndex() int64 {
+	return p.Offset * PAGINATION_COUNT
+}
+
+func (p *Page[T]) GetMaxPages() int64 {
+	return int64(math.Ceil(float64(p.ResultCount) / PAGINATION_COUNT))
+}
+
+func (p *Page[T]) NextPageIndex() int64 {
+	return min(p.Offset+1, p.ResultCount)
+}
+
+func (p *Page[T]) PrevPageIndex() int64 {
+	return max(p.Offset-1, 0)
+}
+
+const PAGINATION_COUNT = 100
