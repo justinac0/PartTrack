@@ -56,6 +56,10 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bolder;
 }
 
+a {
+    color: var(--blue-grey-800);
+}
+
 .menu {
     background-color: var(--grey-50);
     display: flex;
@@ -77,7 +81,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .menu > a:hover {
-    transform: translateY(2px);
     cursor: pointer;
 }
 

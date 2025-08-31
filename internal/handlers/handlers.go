@@ -31,6 +31,10 @@ func dashboardPage(c echo.Context) error {
 	return render(c, http.StatusOK, templates.DashboardPage())
 }
 
+func componentsPage(c echo.Context) error {
+	return render(c, http.StatusOK, templates.ComponentsPage())
+}
+
 func Setup(e *echo.Echo) {
 	db.Init()
 
@@ -39,6 +43,9 @@ func Setup(e *echo.Echo) {
 	e.GET("/", indexPage)
 	g := e.Group("/protected")
 	g.GET("/dashboard", auth.Middleware(dashboardPage, func(c echo.Context) error {
+		return c.String(http.StatusUnauthorized, "you are not authorized to view this content")
+	}))
+	g.GET("/components", auth.Middleware(componentsPage, func(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "you are not authorized to view this content")
 	}))
 }
