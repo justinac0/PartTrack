@@ -4,7 +4,8 @@ templ ComponentsPage() {
     @DashboardLayout("Components") {
         <h1>Components</h1>
         <input type="text" name="search" placeholder="Search"/>
-        <hr>
+        <br>
+        <br>
         <div hx-get="components/page/0" hx-trigger="load" hx-swap="outerHTML"></div>
     }
 }

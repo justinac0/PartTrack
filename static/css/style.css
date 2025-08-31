@@ -48,7 +48,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: var(--grey-300);
+    background-color: var(--grey-50);
     color: var(--grey-900);
 }
 
@@ -91,14 +91,14 @@ th, td {
 }
 
 th {
-    background-color: var(--grey-100);
+    background-color: var(--grey-50);
 }
 
 tr:nth-child(even) {
-    background-color: var(--grey-300);
+    background-color: var(--grey-200);
 }
 tr:nth-child(odd) {
-    background-color: var(--grey-200);
+    background-color: var(--grey-300);
 }
 tr:hover {
     cursor: pointer;
