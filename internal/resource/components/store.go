@@ -1,9 +1,13 @@
 package components
 
 import (
+	"PartTrack/internal"
 	"PartTrack/internal/db"
+	"PartTrack/internal/resource/components/model"
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 )
 
 type ComponentStore struct {
@@ -16,27 +20,36 @@ func NewStore() *ComponentStore {
 	}
 }
 
-func (s *ComponentStore) GetPaginated(ctx context.Context, page uint64) (*ComponentsPaginated, error) {
-	// countRow := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM components;")
+func (s *ComponentStore) GetPaginated(ctx context.Context, page int64) (*internal.Page[model.Component], error) {
+	countRow := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM components;")
 
-	// var list ComponentsPaginated
-	// err := countRow.Scan(&list.Count)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	var list internal.Page[model.Component]
+	list.PageCount = page
 
-	// fmt.Println(page, list.Count/MAX_PAGE_SIZE)
-	// if page  list.Count/MAX_PAGE_SIZE {
-	// 	return nil, errors.New("page out of bounds")
-	// }
+	err := countRow.Scan(&list.MaxPage)
+	if err != nil {
+		return nil, err
+	}
 
-	// list.Components = make([]Component, 0)
+	if page > list.MaxPage/model.PAGINATION_SIZE {
+		return nil, errors.New("page out of bounds")
+	}
 
-	// paginateStmt, err := s.db.PrepareContext(ctx, `SELECT * FROM components LIMIT $1 OFFSET $2;`)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// paginateStmt.ExecContext(ctx)
+	offset := page * model.PAGINATION_SIZE
+	rows, err := s.db.QueryContext(ctx, `SELECT * FROM components LIMIT $1 OFFSET $2;`, model.PAGINATION_SIZE, offset)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	for rows.Next() {
+		var comp model.Component
+		err := rows.Scan(&comp.Id, &comp.AddedBy, &comp.Name, &comp.Description, &comp.Footprint, &comp.Manufacturer, &comp.Supplier, &comp.Amount, &comp.CreatedAt, &comp.DeletedAt)
+		if err != nil {
+			fmt.Println("d")
+			return nil, err
+		}
+		list.Items = append(list.Items, comp)
+	}
+
+	return &list, nil
 }

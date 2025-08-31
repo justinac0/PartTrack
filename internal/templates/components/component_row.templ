@@ -1,0 +1,15 @@
+package components
+
+import "PartTrack/internal/resource/components/model"
+
+templ ComponentRow(data model.Component) {
+    <tr>
+        <td>{data.Id}</td>
+        <td>{data.Name}</td>
+        <td>{data.Description}</td>
+        <td>{data.Footprint}</td>
+        <td>{data.Manufacturer}</td>
+        <td>{data.Supplier}</td>
+        <td>{data.Amount}</td>
+    </tr>
+}

@@ -22,21 +22,29 @@ func NewHandler() *Handler {
 	}
 }
 
+type componentPath struct {
+	Id string `param:"id"`
+}
+
 func (h *Handler) GetPaginated(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	idStr := c.QueryParam("id")
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	path := new(componentPath)
+	if err := c.Bind(path); err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	id, err := strconv.ParseUint(path.Id, 10, 64)
 	if err != nil {
-		fmt.Println(idStr)
+		fmt.Println(path.Id)
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	_, err = h.store.GetPaginated(ctx, id)
+	page, err := h.store.GetPaginated(ctx, int64(id))
 	if err != nil {
-		panic(err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return internal.RenderTempl(c, http.StatusOK, components.ComponentTable())
+	return internal.RenderTempl(c, http.StatusOK, components.ComponentTable(page))
 }

@@ -69,6 +69,31 @@ a {
     border-radius: 0 0 5px 5px;
 }
 
+table {
+  border-collapse: collapse;
+  border-radius: 5px;
+  border-spacing: 5px;
+}
+
+table, th, td {
+  /* border: 1px solid black; */
+}
+
+th, td {
+    padding: 1ch;
+}
+
+th {
+    background-color: var(--grey-100);
+}
+
+tr:nth-child(even) {
+    background-color: var(--blue-grey-100);
+}
+tr:nth-child(odd) {
+    background-color: var(--blue-grey-200);
+}
+
 .menu > * {
     font-size: large;
     margin: 0;

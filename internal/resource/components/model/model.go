@@ -1,4 +1,4 @@
-package components
+package model
 
 import "time"
 
@@ -15,10 +15,4 @@ type Component struct {
 	DeletedAt    *time.Time `json:"deleted_at"`
 }
 
-const MAX_PAGE_SIZE = 50
-
-type ComponentsPaginated struct {
-	Components []Component
-	PageId     uint64
-	Count      uint64
-}
+const PAGINATION_SIZE = 50
