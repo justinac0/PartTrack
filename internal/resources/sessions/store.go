@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"PartTrack/internal/db"
+	"PartTrack/internal/db/models"
 	"context"
 	"database/sql"
 	"errors"
@@ -17,8 +18,8 @@ func NewStore() *SessionStore {
 	}
 }
 
-func (s *SessionStore) GetBySessionId(ctx context.Context, sessionId string) (*Session, error) {
-	session := Session{}
+func (s *SessionStore) GetBySessionId(ctx context.Context, sessionId string) (*models.Session, error) {
+	session := models.Session{}
 	row := s.db.QueryRowContext(
 		ctx,
 		`SELECT session_id, user_id, expires_at, created_at
@@ -32,8 +33,8 @@ func (s *SessionStore) GetBySessionId(ctx context.Context, sessionId string) (*S
 	return &session, nil
 }
 
-func (s *SessionStore) GetByUserId(ctx context.Context, userId uint64) (*Session, error) {
-	session := Session{}
+func (s *SessionStore) GetByUserId(ctx context.Context, userId uint64) (*models.Session, error) {
+	session := models.Session{}
 	row := s.db.QueryRowContext(
 		ctx,
 		`SELECT session_id, user_id, expires_at, created_at
@@ -48,7 +49,7 @@ func (s *SessionStore) GetByUserId(ctx context.Context, userId uint64) (*Session
 
 }
 
-func (s *SessionStore) Create(ctx context.Context, data Session) (*Session, error) {
+func (s *SessionStore) Create(ctx context.Context, data models.Session) (*models.Session, error) {
 	statement, err := s.db.PrepareContext(
 		ctx,
 		`INSERT INTO sessions (session_id, user_id, expires_at, created_at)

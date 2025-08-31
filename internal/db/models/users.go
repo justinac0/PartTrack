@@ -1,4 +1,4 @@
-package users
+package models
 
 import (
 	"time"
@@ -7,10 +7,10 @@ import (
 type UserRole string
 
 const (
-	RoleGuest    UserRole = "guest"
-	RoleCustomer UserRole = "customer"
-	RoleEmployee UserRole = "employee"
-	RoleAdmin    UserRole = "admin"
+	UserRoleGuest    UserRole = "guest"
+	UserRoleCustomer UserRole = "customer"
+	UserRoleEmployee UserRole = "employee"
+	UserRoleAdmin    UserRole = "admin"
 )
 
 type User struct {

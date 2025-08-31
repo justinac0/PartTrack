@@ -1,8 +1,8 @@
 package templates
 
-import "PartTrack/internal/resource/components/model"
+import "PartTrack/internal/db/models"
 
-templ ComponentView(data model.Component) {
+templ ComponentView(data models.Component) {
     @DashboardLayout("Components") {
         <br>
         <a href="javascript:history.back()">← back</a>

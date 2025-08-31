@@ -3,7 +3,7 @@ package components
 import (
 	"PartTrack/internal"
 	"PartTrack/internal/db"
-	"PartTrack/internal/resource/components/model"
+	"PartTrack/internal/db/models"
 	"context"
 	"database/sql"
 	"errors"
@@ -26,10 +26,10 @@ func NewStore() *ComponentStore {
 	}
 }
 
-func (s *ComponentStore) GetOne(ctx context.Context, id uint64) (*model.Component, error) {
+func (s *ComponentStore) GetOne(ctx context.Context, id uint64) (*models.Component, error) {
 	row := s.db.QueryRowContext(ctx, "SELECT * FROM components WHERE id = $1;", id)
 
-	var comp model.Component
+	var comp models.Component
 	err := row.Scan(&comp.Id, &comp.AddedBy, &comp.Name, &comp.Description, &comp.Footprint, &comp.Manufacturer, &comp.Supplier, &comp.Amount, &comp.CreatedAt, &comp.DeletedAt)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (s *ComponentStore) GetOne(ctx context.Context, id uint64) (*model.Componen
 	return &comp, nil
 }
 
-func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search string) (*internal.Page[model.Component], error) {
+func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search string) (*internal.Page[models.Component], error) {
 	searchIncluded := len(search) > 0
 
 	var countRow *sql.Row
@@ -55,7 +55,7 @@ func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search 
 		countRow = s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM components;")
 	}
 
-	var list internal.Page[model.Component]
+	var list internal.Page[models.Component]
 	list.Offset = offset
 
 	var rowCount int64
@@ -94,7 +94,7 @@ func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search 
 	defer rows.Close()
 
 	for rows.Next() {
-		var comp model.Component
+		var comp models.Component
 		err := rows.Scan(&comp.Id, &comp.AddedBy, &comp.Name, &comp.Description, &comp.Footprint, &comp.Manufacturer, &comp.Supplier, &comp.Amount, &comp.CreatedAt, &comp.DeletedAt)
 		if err != nil {
 			fmt.Println(err)

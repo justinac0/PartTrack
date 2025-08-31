@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"PartTrack/internal/resource/users"
+	"PartTrack/internal/resources/users"
 
 	"github.com/labstack/echo/v4"
 )

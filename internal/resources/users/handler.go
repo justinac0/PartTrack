@@ -2,7 +2,8 @@ package users
 
 import (
 	"PartTrack/internal/crypt"
-	"PartTrack/internal/resource/sessions"
+	"PartTrack/internal/db/models"
+	"PartTrack/internal/resources/sessions"
 	"context"
 	"fmt"
 	"net/http"
@@ -39,7 +40,7 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 
 	sessionId := uuid.New()
 
-	session, err := sessionStore.Create(ctx, sessions.Session{
+	session, err := sessionStore.Create(ctx, models.Session{
 		UserId:    userId,
 		SessionId: sessionId.String(), // TODO: generate unique
 		ExpiresAt: &expiry,
@@ -124,11 +125,11 @@ func (h *Handler) Register(c echo.Context) error {
 	}
 
 	now := time.Now().UTC()
-	data := User{
+	data := models.User{
 		Username:     username,
 		Email:        email,
 		PasswordHash: passHash,
-		Role:         RoleGuest,
+		Role:         models.UserRoleGuest,
 		CreatedAt:    &now,
 	}
 

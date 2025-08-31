@@ -2,12 +2,36 @@ package templates
 
 import (
     "PartTrack/internal"
-    "PartTrack/internal/resource/components/model"
 	"PartTrack/internal/templates/components"
 	"fmt"
+	"PartTrack/internal/db/models"
 )
 
-templ ComponentsPage(page *internal.Page[model.Component]) {
+templ AddComponent() {
+<form>
+    <label>Name</label>
+    <input name="name">
+    <br><br>
+    <label>Description</label>
+    <input name="description">
+    <br><br>
+    <label>Footprint</label>
+    <input name="footprint">
+    <br><br>
+    <label>Manufacturer</label>
+    <input name="manufacturer">
+    <br><br>
+    <label>Supplier</label>
+    <input name="supplier">
+    <br><br>
+    <label>Amount</label>
+    <input name="amount">
+    <br><br>
+    <button>Add</button>
+</form>
+}
+
+templ ComponentsPage(page *internal.Page[models.Component]) {
     @DashboardLayout("Components") {
         {{ nextPage := fmt.Sprintf("/protected/components/page/%d?search=%s", page.NextPageIndex(), page.SearchQuery) }}
         {{ prevPage := fmt.Sprintf("/protected/components/page/%d?search=%s", page.PrevPageIndex(), page.SearchQuery) }}
@@ -16,6 +40,9 @@ templ ComponentsPage(page *internal.Page[model.Component]) {
         {{ endItem := page.Offset * internal.PAGINATION_COUNT + int64(len(page.Items)) }}
 
         <h1>Components</h1>
+        @AddComponent()
+        <br>
+
         <form hx-get="/protected/components/page/0"
             hx-trigger="keyup[key=='Enter']"
             hx-swap="outerHTML"
@@ -27,7 +54,6 @@ templ ComponentsPage(page *internal.Page[model.Component]) {
             placeholder="Search"
             autofocus />
         </form>
-        <br>
         <br>
         <button hx-get={ prevPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ prevPage }>prev</button>
         <button hx-get={ nextPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ nextPage }>next</button>

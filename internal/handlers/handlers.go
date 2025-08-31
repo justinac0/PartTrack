@@ -4,8 +4,8 @@ import (
 	"PartTrack/internal"
 	"PartTrack/internal/db"
 	"PartTrack/internal/handlers/auth"
-	"PartTrack/internal/resource/components"
-	"PartTrack/internal/resource/users"
+	"PartTrack/internal/resources/components"
+	"PartTrack/internal/resources/users"
 	"PartTrack/internal/templates"
 	"net/http"
 
@@ -30,6 +30,7 @@ func notAuthorizedPage(c echo.Context) error {
 	return c.String(http.StatusUnauthorized, "you are not authorized to view this content")
 }
 
+// TODO: re-render on DB changes: https://readmedium.com/creating-a-custom-change-data-capture-cdc-tool-in-golang-5a580ba7ac98
 func Setup(e *echo.Echo) {
 	db.Init()
 
