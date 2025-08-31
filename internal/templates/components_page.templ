@@ -13,11 +13,13 @@ templ ComponentsPage(page *internal.Page[model.Component]) {
             type="search"
             name="search"
             placeholder="Search"
-            hx-post="/protected/components/search"
-            hx-trigger="input changed delay:1000ms, keyup[key=='Enter'], load"
-            hx-target="none"/>
+            hx-post="/protected/components/page/0"
+            hx-trigger="input changed delay:500ms, keyup[key=='Enter']" />
         <br>
         <br>
+        <button>prev</button>
+        <button>next</button>
+        <p>results {(page.PageCount+1)*internal.PAGINATION_COUNT} of {page.MaxPage*internal.PAGINATION_COUNT}</p>
         <table id="components">
             <tr>
                 <th>Id</th>

@@ -72,18 +72,20 @@ a:hover {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 
-    display: flex;
-    gap: 2.5ch;
-    flex-direction: row;
-    padding: 1em;
     border: 0;
     border-bottom: 1px;
     border-style: solid;
     border-color: var(--blue-grey-200);
     position: sticky;
     top: 0;
-    width: 100%;
+    width: 100vw;
 }
+
+.menu > * {
+    padding: 1em;
+    display: inline-block;
+}
+
 
 button {
     padding: 1em;
@@ -138,7 +140,7 @@ tr:hover {
 }
 
 .container {
-    margin: 0 10% auto;
+    margin: 0 1em auto;
 }
 
 .htmx-indicator{

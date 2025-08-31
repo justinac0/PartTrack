@@ -51,7 +51,7 @@ func (h *Handler) ViewOne(c echo.Context) error {
 	return internal.RenderTempl(c, http.StatusOK, templates.ComponentView(*comp))
 }
 
-func (h *Handler) GetPaginated(c echo.Context) error {
+func (h *Handler) ViewComponents(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 

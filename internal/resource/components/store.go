@@ -73,18 +73,18 @@ func (s *ComponentStore) GetPaginated(ctx context.Context, page int64, search st
 		return nil, err
 	}
 
-	list.MaxPage = rowCount / model.PAGINATION_SIZE
+	list.MaxPage = rowCount / internal.PAGINATION_COUNT
 
 	if page > list.MaxPage {
 		return nil, errors.New("page out of bounds")
 	}
 	var rows *sql.Rows
 
-	offset := page * model.PAGINATION_SIZE
+	offset := page * internal.PAGINATION_COUNT
 	if searchIncluded {
 		// rows, err = s.db.QueryContext(ctx, fmt.Sprintf(`%s LIMIT $1 OFFSET $2;`, filter), model.PAGINATION_SIZE, offset)
 	} else {
-		rows, err = s.db.QueryContext(ctx, `SELECT * FROM components LIMIT $1 OFFSET $2;`, model.PAGINATION_SIZE, offset)
+		rows, err = s.db.QueryContext(ctx, `SELECT * FROM components LIMIT $1 OFFSET $2;`, internal.PAGINATION_COUNT, offset)
 	}
 	if err != nil {
 		fmt.Println(err)

@@ -5,3 +5,5 @@ type Page[T any] struct {
 	PageCount int64
 	MaxPage   int64
 }
+
+const PAGINATION_COUNT = 20
