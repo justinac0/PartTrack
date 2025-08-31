@@ -1,0 +1,102 @@
+services:
+    backend:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        env_file:
+            - .env
+        ports:
+            - 8000:8000
+        depends_on:
+            - database
+        develop:
+            watch:
+                - path: ./
+                  include:
+                      - "go.mod"
+                      - "go.sum"
+                      - "**/*.go"
+                      - "**/*.templ"
+                  action: rebuild
+                - path: ./static
+                  target: /app/static
+                  action: sync+restart
+
+    database:
+        image: postgres
+        restart: always
+        shm_size: 128mb
+        environment:
+            POSTGRES_USER: ${DATABASE_USER:?}
+            POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?}
+            POSTGRES_DB: ${DATABASE_NAME:?}
+        volumes:
+            - ./sql:/docker-entrypoint-initdb.d:ro
+
+    adminer:
+        image: adminer
+        restart: unless-stopped
+        ports:
+            - 8080:8080
+        depends_on:
+            - database
+        environment:
+            ADMINER_DEFAULT_DRIVER: pgsql
+            ADMINER_DEFAULT_SERVER: database
+            ADMINER_DEFAULT_DB: ${DATABASE_NAME:?}
+            ADMINER_DEFAULT_USERNAME: ${DATABASE_USER:?}
+            ADMINER_DEFAULT_PASSWORD: ${DATABASE_PASSWORD:?}
+            ADMINER_DESIGN_DARK: dracula
+        configs:
+            - source: adminer-index.php
+              target: /var/www/html/index.php
+              mode: 0755
+            - source: adminer-entrypoint.sh
+              target: /usr/local/bin/entrypoint.sh
+              mode: 0755
+
+configs:
+    adminer-entrypoint.sh:
+        content: |
+            #!/bin/sh
+            set -e
+            if [ -n "$$ADMINER_DESIGN" ]; then
+               	# Only create link on initial start, to ensure that explicit changes to
+               	# adminer.css after the container was started once are preserved.
+               	if [ ! -e .adminer-init ]; then
+              		ln -sf "designs/$$ADMINER_DESIGN/adminer.css" .
+               	fi
+            fi
+
+            if [ -n "$$ADMINER_DESIGN_DARK" ]; then
+                # Only create link on initial start, to ensure that explicit changes to
+                # adminer-dark.css after the container was started once are preserved.
+                if [ ! -e .adminer-init ]; then
+                    ln -sf "designs/$$ADMINER_DESIGN_DARK/adminer-dark.css" .
+                fi
+            fi
+
+            number=1
+            for PLUGIN in $$ADMINER_PLUGINS; do
+                php plugin-loader.php "$$PLUGIN" > plugins-enabled/$$(printf "%03d" $$number)-$$PLUGIN.php
+                number=$(($$number+1))
+            done
+
+            touch .adminer-init || true
+
+            exec "$$@"
+    adminer-index.php:
+        content: |
+            <?php
+                if(!count($$_GET)) {
+                    $$_POST['auth'] = [
+                        'server' => $$_ENV['ADMINER_DEFAULT_SERVER'],
+                        'driver' => $$_ENV['ADMINER_DEFAULT_DRIVER'] ?? 'server',
+                        'username' => $$_ENV['ADMINER_DEFAULT_USERNAME'],
+                        'password' => $$_ENV['ADMINER_DEFAULT_PASSWORD'],
+                        'db' => $$_ENV['ADMINER_DEFAULT_DB'],
+                    ];
+                }
+                include './adminer.php';
+            ?>
