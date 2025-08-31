@@ -1,11 +1,37 @@
 package templates
 
-templ ComponentsPage() {
+import (
+    "PartTrack/internal"
+    "PartTrack/internal/resource/components/model"
+	"PartTrack/internal/templates/components"
+)
+
+templ ComponentsPage(page *internal.Page[model.Component]) {
     @DashboardLayout("Components") {
         <h1>Components</h1>
-        <input type="text" name="search" placeholder="Search"/>
+        <input
+            type="search"
+            name="search"
+            placeholder="Search"
+            hx-post="/protected/components/search"
+            hx-trigger="input changed delay:1000ms, keyup[key=='Enter'], load"
+            hx-target="none"/>
         <br>
         <br>
-        <div hx-get="components/page/0" hx-trigger="load" hx-swap="outerHTML"></div>
+        <table id="components">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Footprint</th>
+                <th>Manufacturer</th>
+                <th>Supplier</th>
+                <th>Amount</th>
+            </tr>
+            for _, item := range page.Items {
+                @components.ComponentRow(item)
+            }
+        </table>
+        <br>
     }
 }

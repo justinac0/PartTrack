@@ -26,10 +26,6 @@ func dashboardPage(c echo.Context) error {
 	return internal.RenderTempl(c, http.StatusOK, templates.DashboardPage())
 }
 
-func componentsPage(c echo.Context) error {
-	return internal.RenderTempl(c, http.StatusOK, templates.ComponentsPage())
-}
-
 func notAuthorizedPage(c echo.Context) error {
 	return c.String(http.StatusUnauthorized, "you are not authorized to view this content")
 }
@@ -44,7 +40,6 @@ func Setup(e *echo.Echo) {
 	g.GET("/dashboard", auth.Middleware(dashboardPage, notAuthorizedPage))
 
 	componentsHandler := components.NewHandler()
-	g.GET("/components", auth.Middleware(componentsPage, notAuthorizedPage))
 	g.GET("/components/:id", auth.Middleware(componentsHandler.ViewOne, notAuthorizedPage))
 	g.GET("/components/page/:id", auth.Middleware(componentsHandler.GetPaginated, notAuthorizedPage))
 }

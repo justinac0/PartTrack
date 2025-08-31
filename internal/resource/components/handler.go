@@ -3,7 +3,6 @@ package components
 import (
 	"PartTrack/internal"
 	"PartTrack/internal/templates"
-	"PartTrack/internal/templates/components"
 	"context"
 	"fmt"
 	"net/http"
@@ -56,6 +55,8 @@ func (h *Handler) GetPaginated(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
+	search := c.QueryParam("search")
+
 	path := new(componentPath)
 	if err := c.Bind(path); err != nil {
 		return c.NoContent(http.StatusInternalServerError)
@@ -67,10 +68,10 @@ func (h *Handler) GetPaginated(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	page, err := h.store.GetPaginated(ctx, int64(id))
+	page, err := h.store.GetPaginated(ctx, int64(id), search)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return internal.RenderTempl(c, http.StatusOK, components.ComponentTable(page))
+	return internal.RenderTempl(c, http.StatusOK, templates.ComponentsPage(page))
 }

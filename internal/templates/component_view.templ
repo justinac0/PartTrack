@@ -5,7 +5,7 @@ import "PartTrack/internal/resource/components/model"
 templ ComponentView(data model.Component) {
     @DashboardLayout("Components") {
         <br>
-        <a href="/protected/components">← back</a>
+        <a href="javascript:history.back()">← back</a>
         <h1>{data.Name}</h1>
         <h2>{data.Id}</h2>
         <p>{data.Description}</p>
