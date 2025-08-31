@@ -1,10 +1,10 @@
 package templates
 
 templ ComponentsPage() {
-    @DashboardLayout("Dashboard") {
+    @DashboardLayout("Components") {
         <h1>Components</h1>
         <input type="text" name="search" placeholder="Search"/>
         <hr>
-        <p>components should load here</p>
+        <div hx-get="components/page/0" hx-trigger="load" hx-swap="outerHTML"></div>
     }
 }

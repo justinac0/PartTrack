@@ -1,9 +1,12 @@
 package components
 
 import (
+	"PartTrack/internal"
+	"PartTrack/internal/templates/components"
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -23,12 +26,17 @@ func (h *Handler) GetPaginated(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	page, err := h.store.GetPaginated(ctx, 0)
+	idStr := c.QueryParam("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		fmt.Println(idStr)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	_, err = h.store.GetPaginated(ctx, id)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(page)
-
-	return c.NoContent(http.StatusOK)
+	return internal.RenderTempl(c, http.StatusOK, components.ComponentTable())
 }

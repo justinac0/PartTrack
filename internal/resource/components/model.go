@@ -15,6 +15,8 @@ type Component struct {
 	DeletedAt    *time.Time `json:"deleted_at"`
 }
 
+const MAX_PAGE_SIZE = 50
+
 type ComponentsPaginated struct {
 	Components []Component
 	PageId     uint64
