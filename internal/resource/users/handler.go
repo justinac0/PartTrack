@@ -50,12 +50,12 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 	}
 
 	cookie := http.Cookie{
-		Name:    "session",
-		Value:   session.SessionId,
-		Expires: *session.ExpiresAt,
-		// TODO: needs to support the following cookie attributes in prod
+		Name:     "session",
+		Value:    session.SessionId,
+		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
+		Expires:  *session.ExpiresAt,
 	}
 
 	c.SetCookie(&cookie)
@@ -84,23 +84,24 @@ func (h *Handler) SignIn(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	c.Response().Header().Set("HX-Redirect", "/dashboard")
+	c.Response().Header().Set("HX-Redirect", "/protected/dashboard")
 	return c.NoContent(http.StatusOK)
 }
 
 func (h *Handler) SignOut(c echo.Context) error {
 	cookie, err := c.Cookie("session")
 	if err != nil {
-		c.Response().Header().Set("HX-Redirect", "/")
+		c.Response().Header().Add("HX-Redirect", "/")
 		return c.NoContent(http.StatusOK)
 	}
 
 	cookie.Value = ""
-	cookie.Expires = time.Now().UTC()
+	cookie.Path = "/"
+	cookie.Expires = time.Unix(0, 0)
 
 	c.SetCookie(cookie)
 
-	c.Response().Header().Set("HX-Redirect", "/")
+	c.Response().Header().Add("HX-Redirect", "/")
 	return c.NoContent(http.StatusOK)
 }
 
@@ -111,6 +112,11 @@ func (h *Handler) Register(c echo.Context) error {
 	email := c.FormValue("email")
 	username := c.FormValue("username")
 	password := c.FormValue("password")
+	// retry_password := c.FormValue("retry_password")
+
+	// if password != retry_password {
+	// 	return c.String(http.StatusBadRequest, "passwords don't match")
+	// }
 
 	passHash, err := crypt.HashPassword(password)
 	if err != nil {
@@ -140,7 +146,7 @@ func (h *Handler) Register(c echo.Context) error {
 		panic(err)
 	}
 
-	c.Response().Header().Set("HX-Redirect", "/dashboard")
+	c.Response().Header().Set("HX-Redirect", "/protected/dashboard")
 	return c.NoContent(http.StatusOK)
 }
 
@@ -198,6 +204,7 @@ func ValidateSession(c echo.Context) error {
 
 	cookie, err := c.Cookie("session")
 	if err != nil {
+		fmt.Println("a", err)
 		return sessions.SessionCookieNotSet
 	}
 
@@ -210,18 +217,22 @@ func ValidateSession(c echo.Context) error {
 	userStore := NewStore()
 	user, err := userStore.GetOne(ctx, session.UserId)
 	if err != nil {
+		fmt.Println("b", err)
 		return err
 	}
 
 	if user.Id != session.UserId {
+		fmt.Println("c", err)
 		return sessions.SessionNotFound
 	}
 
 	if cookie.Value != session.SessionId {
+		fmt.Println("d", err)
 		return sessions.SessionIdInvalid
 	}
 
 	if time.Now().After(*session.ExpiresAt) {
+		fmt.Println("e", err)
 		return sessions.SessionExpired
 	}
 

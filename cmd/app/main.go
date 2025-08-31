@@ -21,7 +21,7 @@ func InitEcho() *echo.Echo {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	e.Static("static/", "static/")
+	e.Static("static/", "static")
 
 	return e
 }

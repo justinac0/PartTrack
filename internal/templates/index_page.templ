@@ -6,7 +6,7 @@ templ IndexPage() {
     <h1>PartTrack 💻</h1>
     <div style="background-color: var(--grey-200); border: 1px solid var(--grey-400); padding: 1em; border-radius: 5px;">
         <h2>Sign In</h2>
-        <form id="signin" hx-post="/signin" hx-swap="innerHTML" hx-target="#signin-status">
+        <form id="signin" hx-post="/auth/signin" hx-swap="innerHTML" hx-target="#signin-status">
             <label>Username</label>
             <br>
             <input type="text" name="username" width="100%" required />
@@ -24,7 +24,7 @@ templ IndexPage() {
     <br>
     <div style="background-color: var(--grey-200); border: 1px solid var(--grey-400); padding: 1em; border-radius: 5px;">
         <h2>Register</h2>
-        <form id="register" hx-post="/register" hx-swap="innerHTML" hx-target="#register-status">
+        <form id="register" hx-post="/auth/register" hx-swap="innerHTML" hx-target="#register-status">
             <label>Email</label>
             <br>
             <input type="email" name="email" required />
@@ -42,7 +42,7 @@ templ IndexPage() {
             <br>
             <label>Re-Enter Password</label>
             <br>
-            <input type="password" name="repeat_password" required />
+            <input type="password" name="retry_password" required />
             <br>
             <br>
             <button type="submit" value="submit">Register</button>

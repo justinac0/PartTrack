@@ -3,7 +3,6 @@ package handlers
 import (
 	"PartTrack/internal/db"
 	"PartTrack/internal/handlers/auth"
-	"PartTrack/internal/resource/sessions"
 	"PartTrack/internal/resource/users"
 	"PartTrack/internal/templates"
 	"net/http"
@@ -21,7 +20,7 @@ func render(c echo.Context, status int, t templ.Component) error {
 func indexPage(c echo.Context) error {
 	err := users.ValidateSession(c)
 	if err == nil {
-		c.Response().Header().Set("HX-Redirect", "/dashboard")
+		c.Response().Header().Set("HX-Redirect", "/protected/dashboard")
 		return render(c, http.StatusOK, templates.DashboardPage())
 	}
 
@@ -35,11 +34,11 @@ func dashboardPage(c echo.Context) error {
 func Setup(e *echo.Echo) {
 	db.Init()
 
-	userHandler := users.NewHandler()
-	sessionHandler := sessions.NewHandler()
-
-	auth.Setup(e, userHandler, sessionHandler)
+	auth.Setup(e)
 
 	e.GET("/", indexPage)
-	e.GET("/dashboard", auth.Middleware(dashboardPage))
+	g := e.Group("/protected")
+	g.GET("/dashboard", auth.Middleware(dashboardPage, func(c echo.Context) error {
+		return c.String(http.StatusUnauthorized, "you are not authorized to view this content")
+	}))
 }
