@@ -9,7 +9,7 @@ dev:
 	docker compose $(DOCKER_COMPOSE_ARGS) watch
 
 logs:
-    docker compose $(DOCKER_COMPOSE_ARGS) logs -f
+	docker compose $(DOCKER_COMPOSE_ARGS) logs -f
 
 clean:
 	docker compose $(DOCKER_COMPOSE_ARGS) down --volumes --remove-orphans
