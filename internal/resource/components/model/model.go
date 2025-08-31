@@ -15,4 +15,4 @@ type Component struct {
 	DeletedAt    *time.Time `json:"deleted_at"`
 }
 
-const PAGINATION_SIZE = 50
+const PAGINATION_SIZE = 25

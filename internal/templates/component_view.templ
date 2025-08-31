@@ -1,0 +1,15 @@
+package templates
+
+import "PartTrack/internal/resource/components/model"
+
+templ ComponentView(data model.Component) {
+    @DashboardLayout("Components") {
+        <h1>{data.Name}</h1>
+        <h2>{data.Id}</h2>
+        <p>{data.Description}</p>
+        <p>{data.Footprint}</p>
+        <p>{data.Manufacturer}</p>
+        <p>{data.Supplier}</p>
+        <p>{data.Amount}</p>
+    }
+}

@@ -20,18 +20,34 @@ func NewStore() *ComponentStore {
 	}
 }
 
+func (s *ComponentStore) GetOne(ctx context.Context, id uint64) (*model.Component, error) {
+	row := s.db.QueryRowContext(ctx, "SELECT * FROM components WHERE id = $1;", id)
+
+	var comp model.Component
+	err := row.Scan(&comp.Id, &comp.AddedBy, &comp.Name, &comp.Description, &comp.Footprint, &comp.Manufacturer, &comp.Supplier, &comp.Amount, &comp.CreatedAt, &comp.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &comp, nil
+}
+
 func (s *ComponentStore) GetPaginated(ctx context.Context, page int64) (*internal.Page[model.Component], error) {
 	countRow := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM components;")
 
 	var list internal.Page[model.Component]
 	list.PageCount = page
 
-	err := countRow.Scan(&list.MaxPage)
+	var rowCount int64
+
+	err := countRow.Scan(&rowCount)
 	if err != nil {
 		return nil, err
 	}
 
-	if page > list.MaxPage/model.PAGINATION_SIZE {
+	list.MaxPage = rowCount / model.PAGINATION_SIZE
+
+	if page > list.MaxPage {
 		return nil, errors.New("page out of bounds")
 	}
 

@@ -58,6 +58,13 @@ h1, h2, h3, h4, h5, h6 {
 
 a {
     color: var(--blue-grey-800);
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    cursor: pointer;
 }
 
 .menu {
@@ -69,14 +76,14 @@ a {
     border-radius: 0 0 5px 5px;
 }
 
+
 table {
   border-collapse: collapse;
   border-radius: 5px;
   border-spacing: 5px;
-}
-
-table, th, td {
-  /* border: 1px solid black; */
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--grey-400);
 }
 
 th, td {
@@ -88,10 +95,14 @@ th {
 }
 
 tr:nth-child(even) {
-    background-color: var(--blue-grey-100);
+    background-color: var(--grey-300);
 }
 tr:nth-child(odd) {
-    background-color: var(--blue-grey-200);
+    background-color: var(--grey-200);
+}
+tr:hover {
+    cursor: pointer;
+    background-color: #00ff5e44;
 }
 
 .menu > * {

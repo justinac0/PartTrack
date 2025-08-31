@@ -45,5 +45,6 @@ func Setup(e *echo.Echo) {
 
 	componentsHandler := components.NewHandler()
 	g.GET("/components", auth.Middleware(componentsPage, notAuthorizedPage))
+	g.GET("/components/:id", auth.Middleware(componentsHandler.ViewOne, notAuthorizedPage))
 	g.GET("/components/page/:id", auth.Middleware(componentsHandler.GetPaginated, notAuthorizedPage))
 }
