@@ -5,6 +5,7 @@ import (
 	"PartTrack/internal/handlers/auth"
 	"PartTrack/internal/resource/users"
 	"PartTrack/internal/templates"
+	"log"
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -32,6 +33,8 @@ func dashboardPage(c echo.Context) error {
 }
 
 func componentsPage(c echo.Context) error {
+	log.Println(c.QueryParam("id"))
+
 	return render(c, http.StatusOK, templates.ComponentsPage())
 }
 
@@ -45,7 +48,7 @@ func Setup(e *echo.Echo) {
 	g.GET("/dashboard", auth.Middleware(dashboardPage, func(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "you are not authorized to view this content")
 	}))
-	g.GET("/components", auth.Middleware(componentsPage, func(c echo.Context) error {
+	g.GET("/components/page/:id", auth.Middleware(componentsPage, func(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "you are not authorized to view this content")
 	}))
 }
