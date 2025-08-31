@@ -54,7 +54,7 @@ services:
               mode: 0755
             - source: adminer-entrypoint.sh
               target: /usr/local/bin/entrypoint.sh
-              mode: 075
+              mode: 0755
 
 configs:
     adminer-entrypoint.sh:
