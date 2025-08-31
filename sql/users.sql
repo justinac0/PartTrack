@@ -11,7 +11,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE sessions (
-    session_id UUID DEFAULT gen_random_uuid(),
+    session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id INT UNIQUE NOT NULL,
     expires_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
