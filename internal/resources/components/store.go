@@ -61,7 +61,6 @@ func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search 
 	var rowCount int64
 	err := countRow.Scan(&rowCount)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

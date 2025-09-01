@@ -15,7 +15,7 @@ import (
 func indexPage(c echo.Context) error {
 	err := users.ValidateSession(c)
 	if err == nil {
-		c.Response().Header().Set("HX-Redirect", "/protected/dashboard")
+		c.Response().Header().Add("HX-Redirect", "/protected/dashboard")
 		return internal.RenderTempl(c, http.StatusOK, templates.DashboardPage())
 	}
 

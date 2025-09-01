@@ -162,3 +162,10 @@ tr:hover {
 input[text] {
     padding: 1em;
 }
+
+#errors {
+    position: fixed;
+    right: 1em;
+    bottom: 1em;
+    width: 256px;
+}
