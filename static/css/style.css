@@ -125,7 +125,7 @@ tr:nth-child(odd) {
 }
 tr:hover {
     cursor: pointer;
-    background-color: #00ff5e44;
+    text-decoration: underline;
 }
 
 .menu > * {

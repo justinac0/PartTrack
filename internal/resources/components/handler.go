@@ -75,5 +75,5 @@ func (h *Handler) ViewComponents(c echo.Context) error {
 		page.SearchQuery = search
 	}
 
-	return internal.RenderTempl(c, http.StatusOK, templates.ComponentTable(page))
+	return internal.RenderTempl(c, http.StatusOK, templates.ComponentsPage(page))
 }
