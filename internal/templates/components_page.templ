@@ -46,7 +46,7 @@ templ ComponentsPage(page *internal.Page[models.Component]) {
             type="search"
             name="search"
             hx-get="/protected/components/page/0"
-            hx-trigger="keyup[key=='Enter']"
+            hx-trigger="input changed delay:1000ms, keyup[key=='Enter']"
             hx-swap="outerHTML"
             hx-target="body"
             value={page.SearchQuery}
