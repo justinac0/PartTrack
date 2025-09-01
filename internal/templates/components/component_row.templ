@@ -1,7 +1,7 @@
 package components
 
-import "PartTrack/internal/db/models"
 import "fmt"
+import "PartTrack/internal/db/models"
 
 templ ComponentRow(data models.Component) {
     <tr hx-get={ fmt.Sprintf("/protected/components/%d", data.Id) }>

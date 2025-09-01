@@ -1,4 +1,4 @@
-package sessions
+package stores
 
 import (
 	"PartTrack/internal/db"
@@ -8,17 +8,17 @@ import (
 	"errors"
 )
 
-type SessionStore struct {
+type SessionsStore struct {
 	db *sql.DB
 }
 
-func NewStore() *SessionStore {
-	return &SessionStore{
+func NewSessionsStore() *SessionsStore {
+	return &SessionsStore{
 		db: db.GetHandle(),
 	}
 }
 
-func (s *SessionStore) GetBySessionId(ctx context.Context, sessionId string) (*models.Session, error) {
+func (s *SessionsStore) GetBySessionId(ctx context.Context, sessionId string) (*models.Session, error) {
 	session := models.Session{}
 	row := s.db.QueryRowContext(
 		ctx,
@@ -33,7 +33,7 @@ func (s *SessionStore) GetBySessionId(ctx context.Context, sessionId string) (*m
 	return &session, nil
 }
 
-func (s *SessionStore) GetByUserId(ctx context.Context, userId uint64) (*models.Session, error) {
+func (s *SessionsStore) GetByUserId(ctx context.Context, userId uint64) (*models.Session, error) {
 	session := models.Session{}
 	row := s.db.QueryRowContext(
 		ctx,
@@ -49,7 +49,7 @@ func (s *SessionStore) GetByUserId(ctx context.Context, userId uint64) (*models.
 
 }
 
-func (s *SessionStore) Create(ctx context.Context, data models.Session) (*models.Session, error) {
+func (s *SessionsStore) Create(ctx context.Context, data models.Session) (*models.Session, error) {
 	statement, err := s.db.PrepareContext(
 		ctx,
 		`INSERT INTO sessions (session_id, user_id, expires_at, created_at)
@@ -76,7 +76,7 @@ func (s *SessionStore) Create(ctx context.Context, data models.Session) (*models
 	return &data, nil
 }
 
-func (s *SessionStore) Delete(ctx context.Context, user_id uint64) error {
+func (s *SessionsStore) Delete(ctx context.Context, user_id uint64) error {
 	statement, err := s.db.PrepareContext(
 		ctx,
 		`DELETE FROM sessions WHERE user_id = $1`)

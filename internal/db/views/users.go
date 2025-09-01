@@ -1,10 +1,10 @@
-package users
+package views
 
 import (
 	"PartTrack/internal"
 	"PartTrack/internal/crypt"
 	"PartTrack/internal/db/models"
-	"PartTrack/internal/resources/sessions"
+	"PartTrack/internal/db/stores"
 	"context"
 	"fmt"
 	"net/http"
@@ -16,56 +16,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Handler struct {
-	store *UserStore
+type UsersHandler struct {
+	store *stores.UsersStore
 }
 
-func NewHandler() *Handler {
-	return &Handler{
-		store: NewStore(),
+func NewUsersHandler() *UsersHandler {
+	return &UsersHandler{
+		store: stores.NewUsersStore(),
 	}
 }
 
-// delete old session in db if exists, creates new one and sets browsers cookie
-func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
-	sessionStore := sessions.NewStore()
-	err := sessionStore.Delete(ctx, userId)
-	if err != nil {
-		panic(err)
-	}
-
-	// TODO: write helper for session creation
-	// create session
-	expiry := time.Now().Add(time.Hour * 24).UTC()
-	now := time.Now().UTC()
-
-	sessionId := uuid.New()
-
-	session, err := sessionStore.Create(ctx, models.Session{
-		UserId:    userId,
-		SessionId: sessionId.String(), // TODO: generate unique
-		ExpiresAt: &expiry,
-		CreatedAt: &now,
-	})
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	cookie := http.Cookie{
-		Name:     "session",
-		Value:    session.SessionId,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
-		Expires:  *session.ExpiresAt,
-	}
-
-	c.SetCookie(&cookie)
-
-	return nil
-}
-
-func (h *Handler) SignIn(c echo.Context) error {
+func (h *UsersHandler) SignIn(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -90,7 +51,7 @@ func (h *Handler) SignIn(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *Handler) SignOut(c echo.Context) error {
+func (h *UsersHandler) SignOut(c echo.Context) error {
 	cookie, err := c.Cookie("session")
 	if err != nil {
 		c.Response().Header().Add("HX-Redirect", "/")
@@ -107,7 +68,7 @@ func (h *Handler) SignOut(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *Handler) Register(c echo.Context) error {
+func (h *UsersHandler) Register(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -152,7 +113,7 @@ func (h *Handler) Register(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *Handler) GetUserById(c echo.Context) error {
+func (h *UsersHandler) GetUserById(c echo.Context) error {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
@@ -169,7 +130,7 @@ func (h *Handler) GetUserById(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *Handler) WhoAmI(c echo.Context) error {
+func (h *UsersHandler) WhoAmI(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -184,7 +145,7 @@ func (h *Handler) WhoAmI(c echo.Context) error {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	sessionStore := sessions.NewStore()
+	sessionStore := stores.NewSessionsStore()
 	session, err := sessionStore.GetBySessionId(ctx, cookie.Value)
 	if err != nil {
 		c.Response().Header().Set("HX-Redirect", "/")
@@ -200,6 +161,8 @@ func (h *Handler) WhoAmI(c echo.Context) error {
 	return c.String(http.StatusOK, fmt.Sprintf("%s [%s]", user.Username, strings.ToUpper(string(user.Role))))
 }
 
+// ----------------------------------------------------------------------------
+// TODO: move to somewhere else. not a view
 func ValidateSession(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -207,36 +170,71 @@ func ValidateSession(c echo.Context) error {
 	cookie, err := c.Cookie("session")
 	if err != nil {
 		fmt.Println("a", err)
-		return sessions.SessionCookieNotSet
+		return SessionCookieNotSet
 	}
 
-	sessionStore := sessions.NewStore()
+	sessionStore := stores.NewSessionsStore()
 	session, err := sessionStore.GetBySessionId(ctx, cookie.Value)
 	if err != nil {
-		return sessions.SessionNotFound
+		return SessionNotFound
 	}
 
-	userStore := NewStore()
+	userStore := stores.NewUsersStore()
 	user, err := userStore.GetOne(ctx, session.UserId)
 	if err != nil {
-		fmt.Println("b", err)
 		return err
 	}
 
 	if user.Id != session.UserId {
-		fmt.Println("c", err)
-		return sessions.SessionNotFound
+		return SessionNotFound
 	}
 
 	if cookie.Value != session.SessionId {
-		fmt.Println("d", err)
-		return sessions.SessionIdInvalid
+		return SessionIdInvalid
 	}
 
 	if time.Now().After(*session.ExpiresAt) {
-		fmt.Println("e", err)
-		return sessions.SessionExpired
+		return SessionExpired
 	}
+
+	return nil
+}
+
+// delete old session in db if exists, creates new one and sets browsers cookie
+func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
+	sessionStore := stores.NewSessionsStore()
+	err := sessionStore.Delete(ctx, userId)
+	if err != nil {
+		panic(err)
+	}
+
+	// TODO: write helper for session creation
+	// create session
+	expiry := time.Now().Add(time.Hour * 24).UTC()
+	now := time.Now().UTC()
+
+	sessionId := uuid.New()
+
+	session, err := sessionStore.Create(ctx, models.Session{
+		UserId:    userId,
+		SessionId: sessionId.String(), // TODO: generate unique
+		ExpiresAt: &expiry,
+		CreatedAt: &now,
+	})
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	cookie := http.Cookie{
+		Name:     "session",
+		Value:    session.SessionId,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		Expires:  *session.ExpiresAt,
+	}
+
+	c.SetCookie(&cookie)
 
 	return nil
 }

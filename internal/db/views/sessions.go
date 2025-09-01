@@ -1,16 +1,17 @@
-package sessions
+package views
 
 import (
+	"PartTrack/internal/db/stores"
 	"errors"
 )
 
-type Handler struct {
-	store *SessionStore
+type SessionHandler struct {
+	store *stores.SessionsStore
 }
 
-func NewHandler() *Handler {
-	return &Handler{
-		store: NewStore(),
+func NewSessionHandler() *SessionHandler {
+	return &SessionHandler{
+		store: stores.NewSessionsStore(),
 	}
 }
 

@@ -1,7 +1,8 @@
-package components
+package views
 
 import (
 	"PartTrack/internal"
+	"PartTrack/internal/db/stores"
 	"PartTrack/internal/templates"
 
 	"context"
@@ -13,21 +14,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Handler struct {
-	store *ComponentStore
-}
-
-func NewHandler() *Handler {
-	return &Handler{
-		store: NewStore(),
-	}
-}
-
 type componentPath struct {
 	Id string `param:"id"`
 }
 
-func (h *Handler) ViewOne(c echo.Context) error {
+type ComponentsHanlder struct {
+	store *stores.ComponentStore
+}
+
+func NewComponentsHandler() *ComponentsHanlder {
+	return &ComponentsHanlder{
+		store: stores.NewComponentsStore(),
+	}
+}
+
+func (h *ComponentsHanlder) SingleComponentView(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -50,7 +51,7 @@ func (h *Handler) ViewOne(c echo.Context) error {
 	return internal.RenderTempl(c, http.StatusOK, templates.ComponentView(*comp))
 }
 
-func (h *Handler) ViewComponents(c echo.Context) error {
+func (h *ComponentsHanlder) ComponentsTableView(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 

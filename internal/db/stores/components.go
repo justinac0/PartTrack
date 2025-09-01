@@ -1,4 +1,4 @@
-package components
+package stores
 
 import (
 	"PartTrack/internal"
@@ -20,7 +20,7 @@ type ComponentStore struct {
 	db *sql.DB
 }
 
-func NewStore() *ComponentStore {
+func NewComponentsStore() *ComponentStore {
 	return &ComponentStore{
 		db: db.GetHandle(),
 	}
