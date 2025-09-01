@@ -17,6 +17,12 @@ templ BaseLayout(title string) {
         { children... }
     </main>
     <div id="errors"></div>
+    <script>
+      document.addEventListener('htmx:responseError', event => {
+        const errs = document.getElementById('errors');
+        errs.textContent = event.detail.xhr.responseText;
+      });
+    </script>
   </body>
 </html>
 }

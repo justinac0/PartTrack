@@ -42,18 +42,17 @@ templ ComponentsPage(page *internal.Page[models.Component]) {
         <h1>Components</h1>
         @AddComponent()
         <br>
-
-        <form hx-get="/protected/components/page/0"
-            hx-trigger="keyup[key=='Enter']"
-            hx-swap="outerHTML"
-            hx-target="body">
         <input
             type="search"
             name="search"
+            hx-get="/protected/components/page/0"
+            hx-trigger="keyup[key=='Enter']"
+            hx-swap="outerHTML"
+            hx-target="body"
             value={page.SearchQuery}
             placeholder="Search"
             autofocus />
-        </form>
+        <br>
         <br>
         <button hx-get={ prevPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ prevPage }>prev</button>
         <button hx-get={ nextPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ nextPage }>next</button>

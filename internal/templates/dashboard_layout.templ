@@ -20,12 +20,12 @@ templ DashboardLayout(title string) {
         { children... }
     </main>
     <div id="errors"></div>
-    // <script>
-    //   document.body.addEventListener("htmx:responseError", function(evt) {
-    //      evt.detail.xhr.response contains your server's string
-    //      document.querySelector("#errors").innerHTML = evt.detail.xhr.response
-    //   })
-    // </script>
+    <script>
+      document.addEventListener('htmx:responseError', event => {
+        const errs = document.getElementById('errors');
+        errs.textContent = event.detail.xhr.responseText;
+      });
+    </script>
   </body>
 </html>
 }

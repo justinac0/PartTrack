@@ -167,5 +167,9 @@ input[text] {
     position: fixed;
     right: 1em;
     bottom: 1em;
-    width: 256px;
+    text-align: right;
+    background-color: var(--red-400);
+    border-radius: 5px;
+    font-size: larger;
+    color: white;
 }

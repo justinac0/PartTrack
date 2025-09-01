@@ -7,8 +7,7 @@ import (
 )
 
 func ErrorPopup(c echo.Context, status int, msg string) error {
-	c.Response().Header().Add("HX-Retarget", "#errors")
-	c.Response().Header().Add("HX-Reswap", "outerHTML")
-	html := fmt.Sprintf("<div id='errors'>%d: %s</div>", status, msg)
-	return c.HTML(status, html)
+	c.Response().Header().Set("HX-Retarget", "#errors")
+	c.Response().Header().Set("HX-Reswap", "outerHTML")
+	return c.String(status, fmt.Sprintf("%d: %s", status, msg))
 }

@@ -32,17 +32,17 @@ func (h *Handler) ViewOne(c echo.Context) error {
 
 	path := new(componentPath)
 	if err := c.Bind(path); err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	id, err := strconv.ParseUint(path.Id, 10, 64)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	comp, err := h.store.GetOne(ctx, id)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	c.Response().Header().Add("HX-Redirect", fmt.Sprintf("/protected/components/%d", comp.Id))
@@ -57,17 +57,17 @@ func (h *Handler) ViewComponents(c echo.Context) error {
 
 	path := new(componentPath)
 	if err := c.Bind(path); err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	id, err := strconv.ParseUint(path.Id, 10, 64)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	page, err := h.store.GetPaginated(ctx, int64(id), search)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	if len(search) > 0 {

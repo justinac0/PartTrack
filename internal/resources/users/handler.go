@@ -31,7 +31,7 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 	sessionStore := sessions.NewStore()
 	err := sessionStore.Delete(ctx, userId)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusInternalServerError, err.Error())
+		panic(err)
 	}
 
 	// TODO: write helper for session creation
@@ -48,7 +48,7 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 		CreatedAt: &now,
 	})
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusInternalServerError, err.Error())
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	cookie := http.Cookie{
@@ -62,7 +62,7 @@ func recreateSession(c echo.Context, ctx context.Context, userId uint64) error {
 
 	c.SetCookie(&cookie)
 
-	return c.NoContent(http.StatusOK)
+	return nil
 }
 
 func (h *Handler) SignIn(c echo.Context) error {
@@ -74,19 +74,19 @@ func (h *Handler) SignIn(c echo.Context) error {
 
 	user, err := h.store.GetByUsername(ctx, username)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusInternalServerError, err.Error())
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	if !crypt.VerifyPassword(password, user.PasswordHash) {
-		return internal.ErrorPopup(c, http.StatusBadRequest, "user/password is incorrect")
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, "incorrect username/password")
 	}
 
 	err = recreateSession(c, ctx, user.Id)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusInternalServerError, err.Error())
+		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	c.Response().Header().Add("HX-Redirect", "/protected/dashboard")
+	c.Response().Header().Set("HX-Redirect", "/protected/dashboard")
 	return c.NoContent(http.StatusOK)
 }
 
@@ -141,21 +141,21 @@ func (h *Handler) Register(c echo.Context) error {
 
 	user, err := h.store.GetByUsername(ctx, username)
 	if err != nil {
-		panic(err)
+		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
 	}
 	err = recreateSession(c, ctx, user.Id)
 	if err != nil {
 		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
 	}
 
-	c.Response().Header().Add("HX-Redirect", "/protected/dashboard")
+	c.Response().Header().Set("HX-Redirect", "/protected/dashboard")
 	return c.NoContent(http.StatusOK)
 }
 
 func (h *Handler) GetUserById(c echo.Context) error {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
@@ -163,7 +163,7 @@ func (h *Handler) GetUserById(c echo.Context) error {
 
 	_, err = h.store.GetOne(ctx, id)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		panic(err)
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -174,26 +174,26 @@ func (h *Handler) WhoAmI(c echo.Context) error {
 	defer cancel()
 
 	if ValidateSession(c) != nil {
-		c.Response().Header().Add("HX-Redirect", "/")
+		c.Response().Header().Set("HX-Redirect", "/")
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
 	cookie, err := c.Cookie("session")
 	if err != nil {
-		c.Response().Header().Add("HX-Redirect", "/")
+		c.Response().Header().Set("HX-Redirect", "/")
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
 	sessionStore := sessions.NewStore()
 	session, err := sessionStore.GetBySessionId(ctx, cookie.Value)
 	if err != nil {
-		c.Response().Header().Add("HX-Redirect", "/")
+		c.Response().Header().Set("HX-Redirect", "/")
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
 	user, err := h.store.GetOne(ctx, session.UserId)
 	if err != nil {
-		c.Response().Header().Add("HX-Redirect", "/")
+		c.Response().Header().Set("HX-Redirect", "/")
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
