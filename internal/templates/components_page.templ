@@ -1,12 +1,5 @@
 package templates
 
-import (
-    "PartTrack/internal"
-	"PartTrack/internal/templates/components"
-	"fmt"
-	"PartTrack/internal/db/models"
-)
-
 templ AddComponent() {
 <form>
     <label>Name</label>
@@ -31,14 +24,8 @@ templ AddComponent() {
 </form>
 }
 
-templ ComponentsPage(page *internal.Page[models.Component]) {
+templ ComponentsPage() {
     @DashboardLayout("Components") {
-        {{ nextPage := fmt.Sprintf("/protected/components/page/%d?search=%s", page.NextPageIndex(), page.SearchQuery) }}
-        {{ prevPage := fmt.Sprintf("/protected/components/page/%d?search=%s", page.PrevPageIndex(), page.SearchQuery) }}
-        {{ totalCount := page.ResultCount }}
-        {{ startItem := page.Offset * internal.PAGINATION_COUNT }}
-        {{ endItem := page.Offset * internal.PAGINATION_COUNT + int64(len(page.Items)) }}
-
         <h1>Components</h1>
         @AddComponent()
         <br>
@@ -46,31 +33,13 @@ templ ComponentsPage(page *internal.Page[models.Component]) {
             type="search"
             name="search"
             hx-get="/protected/components/page/0"
-            hx-trigger="input changed delay:1000ms, keyup[key=='Enter']"
+            hx-trigger="input changed delay:1000ms, keyup[key=='Enter'], load"
             hx-swap="outerHTML"
-            hx-target="body"
-            value={page.SearchQuery}
+            hx-target="#components_table"
             placeholder="Search"
             autofocus />
         <br>
         <br>
-        <button hx-get={ prevPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ prevPage }>prev</button>
-        <button hx-get={ nextPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ nextPage }>next</button>
-        <p>results { startItem } to { endItem } of { totalCount  }</p>
-        <table id="components">
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Footprint</th>
-                <th>Manufacturer</th>
-                <th>Supplier</th>
-                <th>Amount</th>
-            </tr>
-            for _, item := range page.Items {
-                @components.ComponentRow(item)
-            }
-        </table>
-        <br>
+        <div id="components_table" hx-get="/protected/components/page/0" hx-trigger="load" hx-swap="outerHTML" hx-target="#components_table"></div>
     }
 }

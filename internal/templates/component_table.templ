@@ -1,0 +1,36 @@
+package templates
+
+import (
+    "fmt"
+    "PartTrack/internal"
+    "PartTrack/internal/db/models"
+	"PartTrack/internal/templates/components"
+) 
+
+templ ComponentTable(page *internal.Page[models.Component]) {
+    <div id="component_table">
+        {{ nextPage := fmt.Sprintf("/protected/components/page/%d?search=%s", page.NextPageIndex(), page.SearchQuery) }}
+        {{ prevPage := fmt.Sprintf("/protected/components/page/%d?search=%s", page.PrevPageIndex(), page.SearchQuery) }}
+        {{ totalCount := page.ResultCount }}
+        {{ startItem := page.Offset * internal.PAGINATION_COUNT }}
+        {{ endItem := page.Offset * internal.PAGINATION_COUNT + int64(len(page.Items)) }}
+
+        <button hx-get={ prevPage } hx-swap="outerHTML" hx-target="#component_table">prev</button>
+        <button hx-get={ nextPage } hx-swap="outerHTML" hx-target="#component_table">next</button>
+        <p>results { startItem } to { endItem } of { totalCount  }</p>
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Footprint</th>
+                <th>Manufacturer</th>
+                <th>Supplier</th>
+                <th>Amount</th>
+            </tr>
+            for _, item := range page.Items {
+                @components.ComponentRow(item)
+            }
+        </table>
+    </div>
+}

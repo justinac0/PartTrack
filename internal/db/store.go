@@ -20,11 +20,11 @@ func GetPaginated[T any](db *sql.DB, ctx context.Context) (*internal.Page[T], DB
 	return nil, nil
 }
 
-func GetOne[T any](db *sql.DB, resource string, id int64) (*T, error) {
+func GetOne[T any](db *sql.DB, resource string, query, id int64) (*T, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	row := db.QueryRowContext(ctx, fmt.Sprintf("SELECT * FROM %s WHERE id = $1;", resource), id)
+	row := db.QueryRowContext(ctx, fmt.Sprintf("SELECT * FROM %v WHERE id = $1;", resource), id)
 
 	var data T
 	err := row.Scan(&data)

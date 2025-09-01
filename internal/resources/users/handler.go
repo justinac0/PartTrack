@@ -74,16 +74,16 @@ func (h *Handler) SignIn(c echo.Context) error {
 
 	user, err := h.store.GetByUsername(ctx, username)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
+		return internal.OnError(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	if !crypt.VerifyPassword(password, user.PasswordHash) {
-		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, "incorrect username/password")
+		return internal.OnError(c, http.StatusUnprocessableEntity, "incorrect username/password")
 	}
 
 	err = recreateSession(c, ctx, user.Id)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusUnprocessableEntity, err.Error())
+		return internal.OnError(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	c.Response().Header().Set("HX-Redirect", "/protected/dashboard")
@@ -117,12 +117,12 @@ func (h *Handler) Register(c echo.Context) error {
 	retry_password := c.FormValue("retry_password")
 
 	if password != retry_password {
-		return internal.ErrorPopup(c, http.StatusBadRequest, "passwords don't match")
+		return internal.OnError(c, http.StatusBadRequest, "passwords don't match")
 	}
 
 	passHash, err := crypt.HashPassword(password)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.OnError(c, http.StatusBadRequest, err.Error())
 	}
 
 	now := time.Now().UTC()
@@ -136,16 +136,16 @@ func (h *Handler) Register(c echo.Context) error {
 
 	_, err = h.store.Create(ctx, data)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.OnError(c, http.StatusBadRequest, err.Error())
 	}
 
 	user, err := h.store.GetByUsername(ctx, username)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.OnError(c, http.StatusBadRequest, err.Error())
 	}
 	err = recreateSession(c, ctx, user.Id)
 	if err != nil {
-		return internal.ErrorPopup(c, http.StatusBadRequest, err.Error())
+		return internal.OnError(c, http.StatusBadRequest, err.Error())
 	}
 
 	c.Response().Header().Set("HX-Redirect", "/protected/dashboard")
