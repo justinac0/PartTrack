@@ -100,30 +100,30 @@ button:hover {
     cursor: pointer;
 }
 
-table {
+.table {
   border-collapse: collapse;
-  border-radius: 5px;
   border-spacing: 5px;
   width: 100%;
   text-align: left;
-  border: 1px solid var(--grey-400);
+  border: 1px solid var(--grey-300);
 }
 
 th, td {
-    padding: 1ch;
+    padding: 1em;
 }
 
-th {
+.table-header {
     background-color: var(--grey-50);
 }
 
-tr:nth-child(even) {
+.table-row:nth-child(even) {
     background-color: var(--grey-200);
 }
-tr:nth-child(odd) {
+.table-row:nth-child(odd) {
     background-color: var(--grey-300);
 }
-tr:hover {
+
+.table-row:hover {
     cursor: pointer;
     text-decoration: underline;
 }

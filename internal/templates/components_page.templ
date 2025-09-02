@@ -56,8 +56,8 @@ templ ComponentsPage(page *internal.Page[models.Component]) {
         <button hx-get={ prevPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ prevPage }>prev</button>
         <button hx-get={ nextPage } hx-swap="outerHTML" hx-target="body" hx-push-url={ nextPage }>next</button>
         <p>results { startItem } to { endItem } of { totalCount  }</p>
-        <table>
-            <tr>
+        <table class="table">
+            <tr class="table-header">
                 <th>Id</th>
                 <th>Name</th>
                 <th>Description</th>

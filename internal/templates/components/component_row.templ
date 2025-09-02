@@ -4,7 +4,7 @@ import "fmt"
 import "PartTrack/internal/db/models"
 
 templ ComponentRow(data models.Component) {
-    <tr hx-get={ fmt.Sprintf("/protected/components/%d", data.Id) }>
+    <tr class="table-row" hx-get={ fmt.Sprintf("/protected/components/%d", data.Id) }>
         <td>{data.Id}</td>
         <td>{data.Name}</td>
         <td>{data.Description}</td>

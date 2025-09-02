@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type StoreError error
@@ -26,7 +27,10 @@ func NewComponentsStore() *ComponentStore {
 	}
 }
 
-func (s *ComponentStore) GetOne(ctx context.Context, id uint64) (*models.Component, error) {
+func (s *ComponentStore) GetOne(id uint64) (*models.Component, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
 	row := s.db.QueryRowContext(ctx, "SELECT * FROM components WHERE id = $1;", id)
 
 	var comp models.Component
@@ -38,7 +42,10 @@ func (s *ComponentStore) GetOne(ctx context.Context, id uint64) (*models.Compone
 	return &comp, nil
 }
 
-func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search string) (*internal.Page[models.Component], error) {
+func (s *ComponentStore) GetPage(offset int64, search string) (*internal.Page[models.Component], error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
 	searchIncluded := len(search) > 0
 
 	var countRow *sql.Row
@@ -103,4 +110,12 @@ func (s *ComponentStore) GetPaginated(ctx context.Context, offset int64, search 
 	}
 
 	return &list, nil
+}
+
+func (s *ComponentStore) UpdateOne(id uint64) error {
+	return nil
+}
+
+func (s *ComponentStore) DeleteOne(id uint64) error {
+	return nil
 }

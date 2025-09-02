@@ -5,11 +5,9 @@ import (
 	"PartTrack/internal/db/stores"
 	"PartTrack/internal/templates"
 
-	"context"
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,19 +17,16 @@ type componentPath struct {
 }
 
 type ComponentsHanlder struct {
-	store *stores.ComponentStore
+	Store *stores.ComponentStore
 }
 
 func NewComponentsHandler() *ComponentsHanlder {
 	return &ComponentsHanlder{
-		store: stores.NewComponentsStore(),
+		Store: stores.NewComponentsStore(),
 	}
 }
 
-func (h *ComponentsHanlder) SingleComponentView(c echo.Context) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
+func (h *ComponentsHanlder) GetOne(c echo.Context) error {
 	path := new(componentPath)
 	if err := c.Bind(path); err != nil {
 		return internal.OnError(c, http.StatusUnprocessableEntity, err.Error())
@@ -42,7 +37,7 @@ func (h *ComponentsHanlder) SingleComponentView(c echo.Context) error {
 		return internal.OnError(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	comp, err := h.store.GetOne(ctx, id)
+	comp, err := h.Store.GetOne(id)
 	if err != nil {
 		return internal.OnError(c, http.StatusUnprocessableEntity, err.Error())
 	}
@@ -51,10 +46,7 @@ func (h *ComponentsHanlder) SingleComponentView(c echo.Context) error {
 	return internal.RenderTempl(c, http.StatusOK, templates.ComponentView(*comp))
 }
 
-func (h *ComponentsHanlder) ComponentsTableView(c echo.Context) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
+func (h *ComponentsHanlder) ComponentsPage(c echo.Context) error {
 	search := c.QueryParam("search")
 
 	path := new(componentPath)
@@ -67,7 +59,7 @@ func (h *ComponentsHanlder) ComponentsTableView(c echo.Context) error {
 		return internal.OnError(c, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	page, err := h.store.GetPaginated(ctx, int64(id), search)
+	page, err := h.Store.GetPage(int64(id), search)
 	if err != nil {
 		return internal.OnError(c, http.StatusUnprocessableEntity, err.Error())
 	}

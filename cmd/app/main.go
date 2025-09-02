@@ -49,8 +49,8 @@ func setupHandlers(e *echo.Echo) {
 
 	p := e.Group("/protected")
 	p.GET("/dashboard", auth.SessionMiddleware(dashboardPage, notAuthorizedPage))
-	p.GET("/components/:id", auth.SessionMiddleware(componentsHandler.SingleComponentView, notAuthorizedPage))
-	p.GET("/components/page/:id", auth.SessionMiddleware(componentsHandler.ComponentsTableView, notAuthorizedPage))
+	p.GET("/components/:id", auth.SessionMiddleware(componentsHandler.GetOne, notAuthorizedPage))
+	p.GET("/components/page/:id", auth.SessionMiddleware(componentsHandler.ComponentsPage, notAuthorizedPage))
 }
 
 func initEcho() *echo.Echo {

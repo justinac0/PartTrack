@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"PartTrack/internal"
+	"time"
+)
 
 type Component struct {
 	Id           uint64     `json:"id"`
@@ -13,4 +16,11 @@ type Component struct {
 	Amount       uint64     `json:"amount"`
 	CreatedAt    *time.Time `json:"created_at"`
 	DeletedAt    *time.Time `json:"deleted_at"`
+}
+
+type ComponentStore interface {
+	GetOne(id uint64) (*Component, error)
+	GetPage(offset uint64, search string) (*internal.Page[Component], error)
+	UpdateOne(id uint64) error
+	DeleteOne(id uint64) error
 }
