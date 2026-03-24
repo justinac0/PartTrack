@@ -47,7 +47,7 @@ services:
             ADMINER_DEFAULT_DB: ${DATABASE_NAME:?}
             ADMINER_DEFAULT_USERNAME: ${DATABASE_USER:?}
             ADMINER_DEFAULT_PASSWORD: ${DATABASE_PASSWORD:?}
-            ADMINER_DESIGN_DARK: dracula
+            ADMINER_DESIGN: win98
         configs:
             - source: adminer-index.php
               target: /var/www/html/index.php
